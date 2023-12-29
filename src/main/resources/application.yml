@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+  threads:
+    virtual:
+      enabled: true

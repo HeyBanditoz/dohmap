@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${establishment.name()}"></title>
+    <div th:replace="~{fragments/scripts.html :: scripts}"></div>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar.html :: navbar}"></nav>
+<div th:insert="~{fragments/inspection.html :: inspection}" class="container">
+</div>
+</body>
+</html>

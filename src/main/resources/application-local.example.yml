@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    username: dohmap
+    password: password
+    url: jdbc:postgresql://127.0.0.1/postgres?currentSchema=schema
+  thymeleaf:
+    cache: false
+
+server:
+  port: 5678
+
+dohmap:
+  google-api-key: gmap-api-key-here
+  selenium:
+    sessions: 2
+    args: >
+      --headless=new
