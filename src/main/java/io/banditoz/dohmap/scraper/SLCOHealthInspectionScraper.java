@@ -45,7 +45,7 @@ public class SLCOHealthInspectionScraper implements Runnable {
         for (; i <= scraperConfig.endPage(); i++) {
             page.gotoPage(i);
             log.info("ON PAGE {}", i);
-            int jmax = page.tableSize();
+            int jmax = page.ready().tableSize();
             for (int j = 0; j < jmax; j++) {
                 InspectionHistoryPage inspectionHistoryPage = page.ready().clickEstablishmentInspections(j);
                 Establishment est = establishmentService.getOrCreateEstablishment(inspectionHistoryPage.getEstablishmentInfo());
