@@ -58,7 +58,9 @@ public class InspectionHistoryPage extends Page<InspectionHistoryPage> {
             try {
                 return Integer.parseInt(percent);
             } catch (NumberFormatException ex) {
-                log.warn("Bad rank value {}", percent);
+                if (!"Not ranked".equals(percent)) {
+                    log.warn("Bad rank value {}", percent);
+                }
             }
         }
         return null;
