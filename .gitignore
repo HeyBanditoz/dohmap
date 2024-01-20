@@ -40,3 +40,4 @@ out/
 dohmap.log*
 sl-*.png
 /src/main/resources/application-local.yml
+flyway.conf
