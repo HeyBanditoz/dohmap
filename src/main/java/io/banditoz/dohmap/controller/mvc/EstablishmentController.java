@@ -1,8 +1,8 @@
 package io.banditoz.dohmap.controller.mvc;
 
-import io.banditoz.dohmap.scraper.model.Establishment;
-import io.banditoz.dohmap.scraper.model.Inspection;
-import io.banditoz.dohmap.scraper.model.Violation;
+import io.banditoz.dohmap.model.Establishment;
+import io.banditoz.dohmap.model.Inspection;
+import io.banditoz.dohmap.model.Violation;
 import io.banditoz.dohmap.service.EstablishmentService;
 import io.banditoz.dohmap.service.InspectionService;
 import io.banditoz.dohmap.service.StatsService;

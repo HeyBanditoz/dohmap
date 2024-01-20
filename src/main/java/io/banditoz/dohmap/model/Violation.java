@@ -1,4 +1,4 @@
-package io.banditoz.dohmap.scraper.model;
+package io.banditoz.dohmap.model;
 
 public record Violation(String id, String inspectionId, String code, String observed, Integer points, boolean critical, int occurrences, boolean correctedOnSite, String publicHealthRationale) {
 

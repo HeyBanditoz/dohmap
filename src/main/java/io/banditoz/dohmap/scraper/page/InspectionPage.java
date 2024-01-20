@@ -1,7 +1,7 @@
 package io.banditoz.dohmap.scraper.page;
 
-import io.banditoz.dohmap.scraper.model.Inspection;
-import io.banditoz.dohmap.scraper.model.Violation;
+import io.banditoz.dohmap.model.Inspection;
+import io.banditoz.dohmap.model.Violation;
 import io.banditoz.dohmap.scraper.page.base.Page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;

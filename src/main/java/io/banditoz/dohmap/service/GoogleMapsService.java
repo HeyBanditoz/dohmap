@@ -9,7 +9,7 @@ import io.banditoz.dohmap.model.EstablishmentLocation;
 import io.banditoz.dohmap.model.googlemaps.GoogleMapsResponse;
 import io.banditoz.dohmap.model.googlemaps.Location;
 import io.banditoz.dohmap.model.googlemaps.ResultsItem;
-import io.banditoz.dohmap.scraper.model.Establishment;
+import io.banditoz.dohmap.model.Establishment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

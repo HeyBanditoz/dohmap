@@ -1,8 +1,8 @@
 package io.banditoz.dohmap.scraper;
 
-import io.banditoz.dohmap.scraper.model.Establishment;
-import io.banditoz.dohmap.scraper.model.Inspection;
-import io.banditoz.dohmap.scraper.model.Violation;
+import io.banditoz.dohmap.model.Establishment;
+import io.banditoz.dohmap.model.Inspection;
+import io.banditoz.dohmap.model.Violation;
 import io.banditoz.dohmap.scraper.page.InspectionHistoryPage;
 import io.banditoz.dohmap.scraper.page.InspectionPage;
 import io.banditoz.dohmap.scraper.page.SearchPage;

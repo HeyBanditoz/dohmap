@@ -2,7 +2,7 @@ package io.banditoz.dohmap.service;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import io.banditoz.dohmap.database.mapper.InspectionMapper;
-import io.banditoz.dohmap.scraper.model.Inspection;
+import io.banditoz.dohmap.model.Inspection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

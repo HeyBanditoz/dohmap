@@ -1,7 +1,6 @@
-package io.banditoz.dohmap.scraper.model;
+package io.banditoz.dohmap.model;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public record Inspection(String id, String establishmentId, LocalDate inspectionDate, String inspectionType, Integer score) {
     public static final class Builder {

@@ -1,7 +1,7 @@
 package io.banditoz.dohmap.database.mapper;
 
 import io.banditoz.dohmap.model.Pin;
-import io.banditoz.dohmap.scraper.model.Establishment;
+import io.banditoz.dohmap.model.Establishment;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

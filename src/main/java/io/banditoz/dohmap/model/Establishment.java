@@ -1,4 +1,4 @@
-package io.banditoz.dohmap.scraper.model;
+package io.banditoz.dohmap.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

@@ -1,6 +1,6 @@
 package io.banditoz.dohmap.database.mapper;
 
-import io.banditoz.dohmap.scraper.model.Violation;
+import io.banditoz.dohmap.model.Violation;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
