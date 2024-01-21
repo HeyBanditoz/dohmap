@@ -68,6 +68,7 @@
                             fetch(`/establishment/${this.options.id}/fragment`)
                                 .then(res => res.text())
                                 .then(html => $('#inspection').html(html))
+                                .then(_ => Init.page())
                         })
                 });
             L.control.layers(null, Object.fromEntries([...cities.entries()].sort())).addTo(map);

@@ -5,7 +5,7 @@
     <title th:text="${establishment.name()}"></title>
     <div th:replace="~{fragments/scripts.html :: scripts}"></div>
 </head>
-<body>
+<body onload="Init.page()">
 <nav th:replace="~{fragments/navbar.html :: navbar}"></nav>
 <div th:insert="~{fragments/inspection.html :: inspection}" class="container">
 </div>
