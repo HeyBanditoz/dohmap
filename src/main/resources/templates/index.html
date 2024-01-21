@@ -50,6 +50,10 @@
             data.data
                 .filter(marker => marker.lat !== null)
                 .forEach(marker => {
+                    // drop ' TS' from markers to group together those cities, i.e. 'MAGNA' and 'MAGNA TS'
+                    if (marker.establishment.city.endsWith(' TS')) {
+                        marker.establishment.city = marker.establishment.city.replace(' TS', '');
+                    }
                     if (!cities.has(marker.establishment.city)) {
                         cities.set(marker.establishment.city, L.layerGroup());
                     }
