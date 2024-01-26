@@ -35,11 +35,22 @@ public class LoggerFilter implements Filter {
     }
 
     private String getLogLine(HttpServletRequest req, HttpServletResponse resp, String path, long durationMs) {
-        return "method=\"%s\" path=\"%s\" duration=\"%dms\" status=\"%s\" ip=\"%s\""
-                .formatted(req.getMethod(), path, durationMs, resp.getStatus(), req.getRemoteHost());
+        return "method=\"%s\" path=\"%s\" duration=\"%dms\" status=\"%s\" %s"
+                .formatted(req.getMethod(), path, durationMs, resp.getStatus(), determineHost(req));
     }
 
     private boolean shouldLog(String path) {
         return !(path.startsWith("/static/") || path.startsWith("/favicon") || path.startsWith("/android-chrome-") || path.startsWith("/apple-"));
+    }
+
+    private String determineHost(HttpServletRequest req) {
+        String xff = req.getHeader("x-forwarded-for");
+        if (xff == null) {
+            return "ip=\"" + req.getRemoteHost() + "\"";
+        } else if (xff.equals(req.getRemoteHost())) {
+            return "ip=\"" + xff + "\"";
+        } else {
+            return "ip=\"%s\" proxy_ip=\"%s\"".formatted(xff, req.getRemoteHost());
+        }
     }
 }
