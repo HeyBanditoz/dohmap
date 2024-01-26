@@ -19,7 +19,8 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf:3.2.0")
     implementation("org.springframework.boot:spring-boot-starter-web:3.2.0")
-    implementation("org.springframework.boot:spring-boot-starter-actuator:3.2.0")
+    implementation("org.springframework.boot:spring-boot-starter-web:3.2.0")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
     implementation("org.seleniumhq.selenium:selenium-java:4.15.0")
     implementation("com.zaxxer:HikariCP:5.0.1")
