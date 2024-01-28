@@ -7,6 +7,7 @@ plugins {
 
 group = "io.banditoz"
 version = "0.0.1-SNAPSHOT"
+val sbVersion = "3.2.2"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -17,18 +18,18 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf:3.2.0")
-    implementation("org.springframework.boot:spring-boot-starter-web:3.2.0")
-    implementation("org.springframework.boot:spring-boot-starter-web:3.2.0")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf:${sbVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-web:${sbVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-undertow:${sbVersion}")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
     implementation("org.seleniumhq.selenium:selenium-java:4.15.0")
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("com.github.f4b6a3:uuid-creator:5.3.3")
     implementation("commons-io:commons-io:2.15.1")
-    developmentOnly("org.springframework.boot:spring-boot-devtools:3.2.0")
+    developmentOnly("org.springframework.boot:spring-boot-devtools:${sbVersion}")
     runtimeOnly("org.postgresql:postgresql:42.7.1")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${sbVersion}")
 }
 
 buildscript {
