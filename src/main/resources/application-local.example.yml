@@ -10,7 +10,9 @@ server:
   port: 5678
 
 dohmap:
-  google-api-key: gmap-api-key-here
+  google-maps:
+    api-key: gmap-api-key-here
+    use-places-api: false
   selenium:
     sessions: 2
     args: >

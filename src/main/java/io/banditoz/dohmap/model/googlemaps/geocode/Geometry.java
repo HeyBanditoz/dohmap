@@ -1,4 +1,4 @@
-package io.banditoz.dohmap.model.googlemaps;
+package io.banditoz.dohmap.model.googlemaps.geocode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

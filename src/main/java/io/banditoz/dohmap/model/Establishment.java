@@ -8,6 +8,11 @@ public record Establishment(String id, String name, String address, String city,
         return "%s, %s, %s %s".formatted(address, city, state, zip);
     }
 
+    @JsonIgnore
+    public String getNameAndFullAddress() {
+        return "%s, %s".formatted(name, getFullAddress());
+    }
+
     public static final class Builder {
         private String id;
         private String name;
