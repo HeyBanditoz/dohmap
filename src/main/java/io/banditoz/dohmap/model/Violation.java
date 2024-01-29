@@ -1,6 +1,7 @@
 package io.banditoz.dohmap.model;
 
-public record Violation(String id, String inspectionId, String code, String observed, Integer points, boolean critical, int occurrences, boolean correctedOnSite, String publicHealthRationale) {
+public record Violation(String id, String inspectionId, String code, String observed, Integer points, boolean critical,
+                        int occurrences, boolean correctedOnSite, String publicHealthRationale) implements Entity {
 
     public static final class Builder {
         private String id;

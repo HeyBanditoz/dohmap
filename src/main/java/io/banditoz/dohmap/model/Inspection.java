@@ -2,7 +2,7 @@ package io.banditoz.dohmap.model;
 
 import java.time.LocalDate;
 
-public record Inspection(String id, String establishmentId, LocalDate inspectionDate, String inspectionType, Integer score) {
+public record Inspection(String id, String establishmentId, LocalDate inspectionDate, String inspectionType, Integer score) implements Entity {
     public static final class Builder {
         private String id;
         private String establishmentId;

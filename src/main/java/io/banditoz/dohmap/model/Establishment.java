@@ -2,7 +2,8 @@ package io.banditoz.dohmap.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public record Establishment(String id, String name, String address, String city, String state, String zip, String phone, String type) {
+public record Establishment(String id, String name, String address, String city, String state, String zip, String phone,
+                            String type) implements Entity {
     @JsonIgnore
     public String getFullAddress() {
         return "%s, %s, %s %s".formatted(address, city, state, zip);

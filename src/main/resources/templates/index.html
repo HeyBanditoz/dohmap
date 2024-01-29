@@ -65,7 +65,7 @@
                             // <div class="d-flex align-items-center justify-content-center"><p>Click on a pin on the map to view an inspection.</p></div>
                             // <div class="progress" style="width: 50em"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div</div>
                             // $('#inspection').html('<div class="progress" style="width: 50em"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div</div>');
-                            fetch(`/establishment/${this.options.id}/fragment`)
+                            fetch(`/establishment/${this.options.id}/fragment`, {headers: {'Accept': 'text/html'}})
                                 .then(res => res.text())
                                 .then(html => $('#inspection').html(html))
                                 .then(_ => Init.page())

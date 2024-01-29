@@ -1,24 +1,45 @@
 <div th:fragment="inspection" th:remove="tag">
     <h1 th:text="'Details for ' + ${establishment.name()}"></h1>
-    <table class="table">
-        <tr>
-            <td>ID</td>
-            <td th:if="${fragView != null}" data-toggle="tooltip" data-placement="top" title="Get a standalone page for this establishment with inspection details."><a target="_blank" th:text="${establishment.id()} + ' ⧉'" th:href="${'/establishment/' + establishment.id()}"></a></td>
-            <td th:if="${fragView == null}" th:text="${establishment.id()}"></td>
-        </tr>
-        <tr>
-            <td>Address</td>
-            <td th:text="${establishment.getFullAddress()}"></td>
-        </tr>
-        <tr>
-            <td>Type</td>
-            <td th:text="${establishment.type()}"></td>
-        </tr>
-        <tr>
-            <td data-toggle="tooltip" data-placement="top" title="The last seen rank as available on the establishment-level on the SLCO health inspection site.">Last Rank</td>
-            <td th:text="${lastRank == null ? '???' : lastRank + '%'}"></td>
-        </tr>
-    </table>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <table class="table">
+                    <tr>
+                        <td>ID</td>
+                        <td th:if="${fragView != null}">
+                            <a data-toggle="tooltip" data-bs-placement="top" title="Get a standalone page for this establishment with inspection details."
+                               target="_blank" th:text="${establishment.id()} + ' ⧉'" th:href="${'/establishment/' + establishment.id()}"></a>
+                        </td>
+                        <td th:if="${fragView == null}" th:text="${establishment.id()}"></td>
+                    </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td th:text="${establishment.getFullAddress()}"></td>
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <td th:text="${establishment.type()}"></td>
+                    </tr>
+                    <tr>
+                        <td data-toggle="tooltip" data-placement="top" title="The last seen rank as available on the establishment-level on the SLCO health inspection site.">Last Rank</td>
+                        <td th:text="${lastRank == null ? '???' : lastRank + '%'}"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-6">
+                <table class="table">
+                    <tr>
+                        <td>First Seen</td>
+                        <td th:text="${establishment.getEntityCreationAsRfc1123()}"></td>
+                    </tr>
+                    <tr>
+                        <td>Phone Number</td>
+                        <td th:text="${establishment.phone()}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
     <h2>Inspections</h2>
     <!--    <button type="button" class="btn btn-primary btn-sm">Toggle All</button>-->
     <p th:if="${inspections.isEmpty()}">No inspections available :(</p>
