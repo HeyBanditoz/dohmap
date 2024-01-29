@@ -49,6 +49,7 @@ public class ScraperDriver implements ApplicationListener<ApplicationReadyEvent>
         WebDriver webDriver = webDriverFactory.buildWebDriver();
         try {
             SearchPage page = new SearchPage(webDriver).navigate();
+            log.info("maxPages={}", page.getMaxPages());
             return page.getMaxPages();
         } finally {
             webDriver.close();
