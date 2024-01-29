@@ -80,7 +80,7 @@ public class GoogleMapsService {
 
     private void indexEstablishmentPlacesApi(Establishment est) {
         Places places = googleMapsPlacesClient.getPlaceByQuery(new TextQuery(est.getNameAndFullAddress()));
-        if (places == null) {
+        if (places == null || places.places() == null) {
             log.warn("Google Maps Places API returned null/empty object for {}, falling back to geocoding API...", est);
             indexEstablishmentGoogleMapsGeocoding(est);
             return;
