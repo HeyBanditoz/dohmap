@@ -35,7 +35,7 @@ public interface EstablishmentMapper {
                    (SELECT rank FROM establishment_rank er WHERE er.establishment_id = e.id ORDER BY er.id DESC LIMIT 1) AS lastRank
             FROM establishment e
                      JOIN establishment_location el ON e.id = el.establishment_id
-            WHERE e.type LIKE '%Restaurants%' OR e.type LIKE '%Beverage%'""")
+            WHERE e.type ILIKE '%Restaurants%' OR e.type ILIKE '%Beverage%' OR e.type ILIKE '%breakfast%'""")
     List<Pin> getPins();
 
     @Select("SELECT rank FROM establishment_rank er WHERE er.establishment_id = #{establishmentId}::uuid ORDER BY er.id DESC LIMIT 1")
@@ -70,6 +70,6 @@ public interface EstablishmentMapper {
     @Select("SELECT COUNT(*) FROM establishment;")
     int getCount();
 
-    @Select("SELECT COUNT(*) FROM establishment WHERE type LIKE '%Restaurants%' OR type LIKE '%Beverage%';")
+    @Select("SELECT COUNT(*) FROM establishment e WHERE e.type ILIKE '%Restaurants%' OR e.type ILIKE '%Beverage%' OR e.type ILIKE '%breakfast%';")
     int getRestaurantBeverageCount();
 }
