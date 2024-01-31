@@ -2,19 +2,15 @@ package io.banditoz.dohmap.config;
 
 import dev.failsafe.RateLimiter;
 import feign.RequestInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
-@Component
 public class GoogleMapsClientConfiguration {
     private final String gmapsApiKey;
     private final RateLimiter<?> limit = RateLimiter.smoothBuilder(50, Duration.ofSeconds(1)).build();
 
-    @Autowired
     public GoogleMapsClientConfiguration(@Value("${dohmap.google-maps.api-key}") String gmapsApiKey) {
         this.gmapsApiKey = gmapsApiKey;
     }

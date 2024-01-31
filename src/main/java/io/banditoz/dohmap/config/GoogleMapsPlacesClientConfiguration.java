@@ -4,11 +4,9 @@ import dev.failsafe.RateLimiter;
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
-@Component
 public class GoogleMapsPlacesClientConfiguration {
     /**
      * TODO ratelimit should support by API method, per Google Maps' docs:<br>
