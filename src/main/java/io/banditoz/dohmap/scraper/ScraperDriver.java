@@ -52,7 +52,7 @@ public class ScraperDriver implements ApplicationListener<ApplicationReadyEvent>
             log.info("maxPages={}", page.getMaxPages());
             return page.getMaxPages();
         } finally {
-            webDriver.close();
+            webDriverFactory.disposeDriver(webDriver);
         }
     }
 
@@ -86,7 +86,7 @@ public class ScraperDriver implements ApplicationListener<ApplicationReadyEvent>
             Thread.ofVirtual().name(getThreadName(newConfig)).start(() -> go(newConfig));
         }
         finally {
-            webDriver.close();
+            webDriverFactory.disposeDriver(webDriver);
         }
     }
 

@@ -10,14 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class WebDriverFactory {
     private static final Logger log = LoggerFactory.getLogger(WebDriverFactory.class);
     private final List<String> customArgs;
-    private final List<ChromeDriver> drivers = new ArrayList<>();
+    private final Set<WebDriver> drivers = new HashSet<>();
 
     @Autowired
     public WebDriverFactory(@Value("${dohmap.selenium.args}") List<String> customArgs) {
@@ -33,14 +34,21 @@ public class WebDriverFactory {
         return driver;
     }
 
+    public void disposeDriver(WebDriver driver) {
+        driver.close();
+        if (!drivers.remove(driver)) {
+            log.warn("{} wasn't contained within {}", driver, drivers);
+        }
+    }
+
     @PreDestroy
     public void destroyAllDrivers() {
-        for (ChromeDriver driver : drivers) {
+        for (WebDriver driver : drivers) {
             if (driver == null) {
                 continue;
             }
             try {
-                driver.close();
+                driver.quit();
                 log.info("Closed driver {}", driver);
             } catch (Exception ex) {
                 log.error("Exception destroying {}!", driver, ex);
