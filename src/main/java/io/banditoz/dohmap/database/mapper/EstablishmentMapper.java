@@ -67,6 +67,9 @@ public interface EstablishmentMapper {
               (#{id}::uuid, #{name}, #{address}, #{city}, #{state}, #{zip}, #{phone}, #{type})""")
     Integer insertEstablishment(Establishment establishment);
 
+    @Update("UPDATE establishment SET last_seen = now() WHERE id = #{id}::uuid")
+    Integer updateLastSeen(Establishment establishment);
+
     @Select("SELECT COUNT(*) FROM establishment;")
     int getCount();
 

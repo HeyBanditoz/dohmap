@@ -28,6 +28,8 @@ public class EstablishmentService {
         if (est == null) {
             est = candidate.setId(UuidCreator.getTimeOrderedEpoch().toString()).build();
             establishmentMapper.insertEstablishment(est);
+        } else {
+            establishmentMapper.updateLastSeen(est);
         }
         // also fetch location from Google Maps, if needed
         googleMapsService.indexEstablishment(est);
