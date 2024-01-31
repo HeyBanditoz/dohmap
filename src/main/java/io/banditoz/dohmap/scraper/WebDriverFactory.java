@@ -35,6 +35,7 @@ public class WebDriverFactory {
     }
 
     public void disposeDriver(WebDriver driver) {
+        log.info("Disposing of {}", driver);
         driver.close();
         if (!drivers.remove(driver)) {
             log.warn("{} wasn't contained within {}", driver, drivers);

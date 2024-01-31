@@ -12,16 +12,13 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 @Service
 public class ScraperDriver implements ApplicationListener<ApplicationReadyEvent> {
@@ -63,19 +60,23 @@ public class ScraperDriver implements ApplicationListener<ApplicationReadyEvent>
             return;
         }
         for (PageConfiguration page : PageConfiguration.dividePages(getMaxPages(), maxSessions)) {
-            Thread.ofVirtual().name(getThreadName(page)).start(() -> go(page));
+            Thread.ofVirtual().start(() -> {
+                for (int i = page.startPage(); i <= page.endPage(); i++) {
+                    Thread.currentThread().setName(getThreadName(page, i));
+                    go(page, i);
+                }
+            });
         }
     }
 
-    private void go(PageConfiguration pageConfiguration) {
+    private void go(PageConfiguration pc, int page) {
         WebDriver webDriver = webDriverFactory.buildWebDriver();
         SLCOHealthInspectionScraper s = null;
         try {
-            s = new SLCOHealthInspectionScraper(webDriver, pageConfiguration, establishmentService, inspectionService, violationService);
+            s = new SLCOHealthInspectionScraper(webDriver, page, establishmentService, inspectionService, violationService);
             s.run();
         } catch (Exception ex) {
-            PageConfiguration newConfig = new PageConfiguration(s.getPage(), pageConfiguration.endPage());
-            log.error("Encountered fatal exception. Will attempt to restart from {}. This could loop if there are network errors!", newConfig, ex);
+            log.error("Encountered fatal exception. Will attempt to restart current page {}. This could loop if there are network errors!", page, ex);
             File screenshot = ((TakesScreenshot) webDriver).getScreenshotAs(OutputType.FILE);
             try {
                 log.info("Screenshot saved.");
@@ -83,14 +84,14 @@ public class ScraperDriver implements ApplicationListener<ApplicationReadyEvent>
             } catch (IOException e) {
                 log.error("Error saving file.", e);
             }
-            Thread.ofVirtual().name(getThreadName(newConfig)).start(() -> go(newConfig));
+            Thread.ofVirtual().name(getThreadName(pc, page)).start(() -> go(pc, page));
         }
         finally {
             webDriverFactory.disposeDriver(webDriver);
         }
     }
 
-    private String getThreadName(PageConfiguration pc) {
-        return "sl-" + UUID.randomUUID().toString().substring(0, 4) + '-' + pc.tName();
+    private String getThreadName(PageConfiguration pc, int cc) {
+        return "sl-" + cc + "-" + pc.tName();
     }
 }
