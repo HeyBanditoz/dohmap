@@ -34,7 +34,8 @@
                     </tr>
                     <tr>
                         <td>Phone Number</td>
-                        <td th:text="${establishment.phone()}"></td>
+                        <td th:if="${establishment.phone() == null}"><i>Unknown</i></td>
+                        <td th:if="${establishment.phone() != null}" th:text="${establishment.phone()}"></td>
                     </tr>
                 </table>
             </div>

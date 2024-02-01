@@ -42,7 +42,8 @@ public class InspectionHistoryPage extends Page<InspectionHistoryPage> {
         } else {
             log.warn("CITY_STATE_ZIP regex did not match against \"{}\"", csz);
         }
-        builder.setPhone(cols.get(3).findElements(By.tagName("td")).get(1).getText());
+        String phone = cols.get(3).findElements(By.tagName("td")).get(1).getText();
+        builder.setPhone(phone.isBlank() ? null : phone);
         builder.setType(cols.get(4).findElements(By.tagName("td")).get(1).getText());
         return builder;
     }
