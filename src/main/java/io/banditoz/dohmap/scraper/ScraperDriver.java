@@ -1,6 +1,6 @@
 package io.banditoz.dohmap.scraper;
 
-import io.banditoz.dohmap.scraper.page.SearchPage;
+import io.banditoz.dohmap.scraper.page.slco.SearchPage;
 import io.banditoz.dohmap.scraper.page.base.PageConfiguration;
 import io.banditoz.dohmap.service.EstablishmentService;
 import io.banditoz.dohmap.service.InspectionService;

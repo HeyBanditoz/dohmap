@@ -16,7 +16,8 @@ public interface EstablishmentMapper {
                    state,
                    zip,
                    phone,
-                   type
+                   type,
+                   last_seen
             FROM establishment
             WHERE id = #{id}::uuid""")
     Establishment getById(String id);
@@ -49,7 +50,8 @@ public interface EstablishmentMapper {
                    state,
                    zip,
                    phone,
-                   type
+                   type,
+                   last_seen
             FROM establishment
             WHERE name = #{name}
               AND address = #{address}

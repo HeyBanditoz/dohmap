@@ -2,8 +2,10 @@ package io.banditoz.dohmap.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.time.OffsetDateTime;
+
 public record Establishment(String id, String name, String address, String city, String state, String zip, String phone,
-                            String type) implements Entity {
+                            String type, OffsetDateTime lastSeen) implements Entity {
     @JsonIgnore
     public String getFullAddress() {
         return "%s, %s, %s %s".formatted(address, city, state, zip);
@@ -68,7 +70,7 @@ public record Establishment(String id, String name, String address, String city,
         }
 
         public Establishment build() {
-            return new Establishment(id, name, address, city, state, zip, phone, type);
+            return new Establishment(id, name, address, city, state, zip, phone, type, null);
         }
     }
 }

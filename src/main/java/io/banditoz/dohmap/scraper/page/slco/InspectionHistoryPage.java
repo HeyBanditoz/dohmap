@@ -1,4 +1,4 @@
-package io.banditoz.dohmap.scraper.page;
+package io.banditoz.dohmap.scraper.page.slco;
 
 import io.banditoz.dohmap.model.Establishment;
 import io.banditoz.dohmap.scraper.page.base.Page;

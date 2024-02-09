@@ -8,6 +8,6 @@ public record Pin(Establishment establishment, Double lat, Double lng, Integer l
     @SuppressWarnings("unused") // for mybatis
     public Pin(String id, String name, String address, String city, String state, String zip, String phone, String type,
                Double lat, Double lng, Integer lastRank) {
-        this(new Establishment(id, name, address, city, state, zip, phone, type), lat, lng, lastRank, false);
+        this(new Establishment(id, name, address, city, state, zip, phone, type, null), lat, lng, lastRank, false);
     }
 }
