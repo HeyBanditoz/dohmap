@@ -4,6 +4,7 @@ import io.banditoz.dohmap.model.Pin;
 import io.banditoz.dohmap.model.Establishment;
 import org.apache.ibatis.annotations.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @Mapper
@@ -77,4 +78,7 @@ public interface EstablishmentMapper {
 
     @Select("SELECT COUNT(*) FROM establishment e WHERE e.type ILIKE '%Restaurants%' OR e.type ILIKE '%Beverage%' OR e.type ILIKE '%breakfast%';")
     int getRestaurantBeverageCount();
+
+    @Select("SELECT last_seen FROM establishment ORDER BY last_seen DESC LIMIT 1 OFFSET 50")
+    Instant get50thLatestLastSeen();
 }

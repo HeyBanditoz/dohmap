@@ -2,6 +2,7 @@ package io.banditoz.dohmap.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.f4b6a3.uuid.util.UuidUtil;
+import io.banditoz.dohmap.utils.DateUtils;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -19,6 +20,6 @@ public interface Entity {
     @JsonIgnore // required?
     default String getEntityCreationAsRfc1123() {
         Instant creationDate = UuidUtil.getInstant(UUID.fromString(id()));
-        return DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.ofInstant(creationDate, ZoneId.systemDefault()));
+        return DateUtils.getDateAsRfc1123(creationDate);
     }
 }

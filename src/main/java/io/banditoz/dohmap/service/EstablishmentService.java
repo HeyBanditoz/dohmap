@@ -8,6 +8,8 @@ import io.banditoz.dohmap.model.Establishment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 @Service
 public class EstablishmentService {
     private final EstablishmentMapper establishmentMapper;
@@ -50,5 +52,9 @@ public class EstablishmentService {
         }
         EstablishmentRank establishmentRank = new EstablishmentRank(UuidCreator.getTimeOrderedEpoch().toString(), e.id(), rank);
         establishmentRankMapper.insert(establishmentRank);
+    }
+
+    public Instant getLastSeenCutoff() {
+        return establishmentMapper.get50thLatestLastSeen();
     }
 }

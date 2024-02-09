@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -57,6 +59,7 @@ public class EstablishmentController {
         if (est == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find establishment");
         }
+        Instant lastSeenCutoff = establishmentService.getLastSeenCutoff().minus(1, ChronoUnit.DAYS);
         // TODO n+1 present here
         List<InspectionViolation> list = inspectionService.getAllInspectionsByEstablishmentId(est.id())
                 .stream()
@@ -66,6 +69,7 @@ public class EstablishmentController {
         Integer lastRank = establishmentService.getLastRankForEstablishment(est.id());
 
         model.addAttribute("establishment", est);
+        model.addAttribute("lastSeenCutoff", lastSeenCutoff);
         model.addAttribute("lastRank", lastRank);
         model.addAttribute("inspections", list);
         model.addAttribute("count", statsService.getCountOfEstInspVioAsString());
