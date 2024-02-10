@@ -1,6 +1,7 @@
 package io.banditoz.dohmap.service;
 
 import com.github.f4b6a3.uuid.UuidCreator;
+import com.google.common.base.Suppliers;
 import io.banditoz.dohmap.database.mapper.EstablishmentMapper;
 import io.banditoz.dohmap.database.mapper.EstablishmentRankMapper;
 import io.banditoz.dohmap.model.EstablishmentRank;
@@ -9,12 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @Service
 public class EstablishmentService {
     private final EstablishmentMapper establishmentMapper;
     private final EstablishmentRankMapper establishmentRankMapper;
     private final GoogleMapsService googleMapsService;
+    private final Supplier<Instant> lastSeenCache;
 
     @Autowired
     public EstablishmentService(EstablishmentMapper establishmentMapper,
@@ -23,6 +27,7 @@ public class EstablishmentService {
         this.establishmentMapper = establishmentMapper;
         this.establishmentRankMapper = establishmentRankMapper;
         this.googleMapsService = googleMapsService;
+        this.lastSeenCache = Suppliers.memoizeWithExpiration(establishmentMapper::get50thLatestLastSeen, 12, TimeUnit.HOURS);
     }
 
     public Establishment getOrCreateEstablishment(Establishment.Builder candidate) {
@@ -55,6 +60,6 @@ public class EstablishmentService {
     }
 
     public Instant getLastSeenCutoff() {
-        return establishmentMapper.get50thLatestLastSeen();
+        return lastSeenCache.get();
     }
 }
