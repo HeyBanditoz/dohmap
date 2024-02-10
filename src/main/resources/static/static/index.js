@@ -1,3 +1,15 @@
+const greyIcon = new L.Icon({
+    iconUrl: "/static/leaflet/images/marker-icon-grey.png",
+    iconRetinaUrl: "/static/leaflet/images/marker-icon-2x-grey.png",
+    shadowUrl: "/static/leaflet/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41]
+})
+const baseIcon = L.marker().getIcon(); // TODO surely the default icon is defined somewhere...
+
 function setup() {
     const map = L.map('map').setView([40.64053, -111.934204], 11);
 
@@ -30,11 +42,11 @@ async function fetchPins() {
                     if (!cities.has(marker.establishment.city)) {
                         cities.set(marker.establishment.city, L.layerGroup());
                     }
-                    L.marker([marker.lat, marker.lng], {id: marker.establishment.id})
+                    L.marker([marker.lat, marker.lng], {id: marker.establishment.id, icon: (marker.possiblyGone ? greyIcon : baseIcon)})
                         // .bindPopup(`<b>${marker.establishment.name} <a target="_blank" title="Open standalone page for this establishment" href="/establishment/${marker.establishment.id}">⧉</a></b><br>${marker.establishment.address}<br>${marker.lat},${marker.lng}`)
                         .addTo(cities.get(marker.establishment.city))
                         .bindTooltip(`<b class="${marker.possiblyGone ? 'gone' : ''}">${marker.establishment.name}${marker.coordinatesModified ? '*' : ''}</b><br>${marker.establishment.address}`)
-                        .on('click', (pin) => handlePinClick(pin))
+                        .on('click', (pin) => handlePinClick(pin));
                 });
         })
     return cities;
