@@ -39,8 +39,10 @@
                             class="text-danger"
                             data-toggle="tooltip" data-bs-placement="bottom"
                             title="This establishment most likely doesn't exist from the source, as it was last seen over a day ago via the latest inspection's update. It may have been renamed, merged, or otherwise deleted."
-                            th:text="'!!!! ' + ${T(io.banditoz.dohmap.utils.DateUtils).getDateAsRfc1123(establishment.lastSeen())}">
-                            <!-- TODO better warning indicator above. Underline with prepended exclamations look ugly. -->
+                            th:text="${establishment.lastSeen().toEpochMilli()} == 1706683527668
+                                     ? 'Before ' + ${T(io.banditoz.dohmap.utils.DateUtils).getDateAsRfc1123(establishment.lastSeen())}
+                                     : ${T(io.banditoz.dohmap.utils.DateUtils).getDateAsRfc1123(establishment.lastSeen())}">
+                            <!-- TODO better warning indicator above. Underline looks ugly. And maybe not hardcode magic long? -->
                         <td th:if="${establishment.lastSeen().compareTo(lastSeenCutoff) > 0}"
                             th:text="${T(io.banditoz.dohmap.utils.DateUtils).getDateAsRfc1123(establishment.lastSeen())}">
                     </tr>
