@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public class EstablishmentPinService {
     public List<Pin> getPins() {
         Map<List<Double>, List<Pin>> coordinatePinPair = establishmentMapper.getPins()
                 .stream()
+                .sorted(Comparator.comparing(o -> o.establishment().name()))
                 .collect(Collectors.groupingBy(pin -> List.of(pin.lat(), pin.lng())));
         coordinatePinPair.forEach((coords, pins) -> {
             if (pins.size() == 1) {
