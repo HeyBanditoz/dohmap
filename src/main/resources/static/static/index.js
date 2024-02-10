@@ -33,7 +33,7 @@ async function fetchPins() {
                     L.marker([marker.lat, marker.lng], {id: marker.establishment.id})
                         // .bindPopup(`<b>${marker.establishment.name} <a target="_blank" title="Open standalone page for this establishment" href="/establishment/${marker.establishment.id}">⧉</a></b><br>${marker.establishment.address}<br>${marker.lat},${marker.lng}`)
                         .addTo(cities.get(marker.establishment.city))
-                        .bindTooltip(`<b>${marker.establishment.name}${marker.coordinatesModified ? '*' : ''}</b><br>${marker.establishment.address}`)
+                        .bindTooltip(`<b class="${marker.possiblyGone ? 'gone' : ''}">${marker.establishment.name}${marker.coordinatesModified ? '*' : ''}</b><br>${marker.establishment.address}`)
                         .on('click', (pin) => handlePinClick(pin))
                 });
         })

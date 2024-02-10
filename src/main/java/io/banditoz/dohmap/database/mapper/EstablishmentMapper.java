@@ -23,6 +23,7 @@ public interface EstablishmentMapper {
             WHERE id = #{id}::uuid""")
     Establishment getById(String id);
 
+    // TODO need to centralize last_seen logic below there...
     @Select("""
             SELECT e.id,
                    name,
@@ -34,7 +35,8 @@ public interface EstablishmentMapper {
                    type,
                    lat,
                    lng,
-                   (SELECT rank FROM establishment_rank er WHERE er.establishment_id = e.id ORDER BY er.id DESC LIMIT 1) AS lastRank
+                   (SELECT rank FROM establishment_rank er WHERE er.establishment_id = e.id ORDER BY er.id DESC LIMIT 1) AS lastRank,
+                   (SELECT last_seen FROM establishment ORDER BY last_seen DESC LIMIT 1 OFFSET 50) - INTERVAL '1 day' > e.last_seen AS possiblyGone
             FROM establishment e
                      JOIN establishment_location el ON e.id = el.establishment_id
             WHERE e.type ILIKE '%Restaurants%' OR e.type ILIKE '%Beverage%' OR e.type ILIKE '%breakfast%'""")
