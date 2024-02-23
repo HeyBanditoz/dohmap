@@ -3,6 +3,7 @@ package io.banditoz.dohmap.scraper.page.slco;
 import io.banditoz.dohmap.model.Establishment;
 import io.banditoz.dohmap.scraper.page.base.Page;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -97,5 +98,9 @@ public class InspectionHistoryPage extends Page<InspectionHistoryPage> {
 
     public void back() {
         click(findElement(By.id("ctl00_PageContent_OKButton__Button")));
+    }
+
+    public void removeAjax() {
+        ((JavascriptExecutor) driver).executeScript("$('#ctl00_PageContent_UpdatePanel1_UpdateProgress1').remove()");
     }
 }

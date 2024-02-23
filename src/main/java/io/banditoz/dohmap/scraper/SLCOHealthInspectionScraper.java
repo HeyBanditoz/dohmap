@@ -47,6 +47,7 @@ public class SLCOHealthInspectionScraper implements Runnable {
             Establishment est = establishmentService.getOrCreateEstablishment(inspectionHistoryPage.getEstablishmentInfo());
             establishmentService.indexEstablishmentRank(est, inspectionHistoryPage.getRank());
             for (Map.Entry<String, Integer> ent : inspectionHistoryPage.getInspections().entrySet()) {
+                inspectionHistoryPage.removeAjax();
                 InspectionPage inspectionPage = inspectionHistoryPage.clickInspection(ent.getValue());
                 Inspection inspection = inspectionService.getOrCreateInspection(inspectionPage.getInspection().setEstablishmentId(est.id()));
                 List<Violation.Builder> violations = inspectionPage.getViolations();
