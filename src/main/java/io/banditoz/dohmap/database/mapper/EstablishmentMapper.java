@@ -46,6 +46,7 @@ public interface EstablishmentMapper {
     Integer getLastRankForEstablishment(String establishmentId);
 
     @Select("""
+            <script>
             SELECT id,
                    name,
                    address,
@@ -61,8 +62,11 @@ public interface EstablishmentMapper {
               AND city = #{city}
               AND state = #{state}
               AND zip = #{zip}
-              AND phone = #{phone}
-              AND type = #{type}""")
+              AND <if test="phone != null">phone = #{phone}</if> <if test="phone == null">phone IS NULL</if>
+              AND type = #{type}
+            ORDER BY id DESC
+            LIMIT 1; -- TODO remove once duplicate restaurants (those w/o phones) are fixed
+            </script>""")
     Establishment getByEstablishment(Establishment establishment);
 
     @Insert("""
