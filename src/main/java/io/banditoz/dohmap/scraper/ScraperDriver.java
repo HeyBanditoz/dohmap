@@ -13,15 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 
 @Service
-public class ScraperDriver implements ApplicationListener<ApplicationReadyEvent> {
+public class ScraperDriver {
     private final WebDriverFactory webDriverFactory;
     private final EstablishmentService establishmentService;
     private final InspectionService inspectionService;
@@ -53,8 +51,7 @@ public class ScraperDriver implements ApplicationListener<ApplicationReadyEvent>
         }
     }
 
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
+    public void kickOffScraper() {
         if (maxSessions <= 0) {
             log.warn("NOT running ScraperDriver as max sessions is {}!", maxSessions);
             return;
