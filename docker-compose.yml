@@ -1,0 +1,28 @@
+---
+version: '3.3'
+services:
+  dohmap:
+    container_name: dohmap
+    networks:
+      - services
+    volumes:
+      - './application.yml:/app/application.yml:ro'
+    restart: always
+    ports:
+      - 5678:5678/tcp
+    image: dohmap-local
+    shm_size: 2gb
+    security_opt:
+      - seccomp=chrome-seccomp.json
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    # memory (Xmx) is explicit set so the container has enough memory to run Chromium
+    # plus, the application *shouldn't* be memory heavy (but it is Java!)
+    entrypoint: [ 'java', '-Xmx256M', '-jar', '/app/dohmap.jar' ]
+
+networks:
+  services:
+    driver: bridge
+    name: services
