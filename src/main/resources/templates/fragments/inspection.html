@@ -6,11 +6,16 @@
                 <table class="table">
                     <tr>
                         <td>ID</td>
-                        <td th:if="${fragView != null}">
-                            <a data-toggle="tooltip" data-bs-placement="top" title="Get a standalone page for this establishment with inspection details."
-                               target="_blank" th:text="${establishment.id()} + ' ⧉'" th:href="${'/establishment/' + establishment.id()}"></a>
+                        <td class="d-flex">
+                            <div th:if="${fragView != null}">
+                                <a data-toggle="tooltip" data-bs-placement="top" title="Get a standalone page for this establishment with inspection details."
+                                   target="_blank" th:text="${establishment.id()} + ' ⧉'" th:href="${'/establishment/' + establishment.id()}"></a>
+                            </div>
+                        <div th:if="${fragView == null}" th:text="${establishment.id()}"></div>
+                        &nbsp;&#8212;&nbsp;
+                        <a data-toggle="tooltip" data-bs-placement="top" title="Get this establishment as JSON."
+                               target="_blank" th:href="${'/api/v1/establishment/' + establishment.id()}">JSON</a>
                         </td>
-                        <td th:if="${fragView == null}" th:text="${establishment.id()}"></td>
                     </tr>
                     <tr>
                         <td>Address</td>
