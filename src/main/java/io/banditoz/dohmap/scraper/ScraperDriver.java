@@ -66,6 +66,19 @@ public class ScraperDriver {
         }
     }
 
+    public void runOnePage() {
+        log.info("Running ScraperDriver for one page only...");
+        Thread.ofVirtual().start(() -> {
+            PageConfiguration pc = new PageConfiguration(1, 2);
+            Thread.currentThread().setName(getThreadName(pc, 1));
+            go(pc, 1);
+        });
+    }
+
+    public int getMaxSessions() {
+        return maxSessions;
+    }
+
     private void go(PageConfiguration pc, int page) {
         WebDriver webDriver = webDriverFactory.buildWebDriver();
         SLCOHealthInspectionScraper s = null;

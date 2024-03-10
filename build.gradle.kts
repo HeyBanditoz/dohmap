@@ -20,6 +20,7 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf:${sbVersion}")
     implementation("org.springframework.boot:spring-boot-starter-web:${sbVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-security:${sbVersion}")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
     implementation("org.seleniumhq.selenium:selenium-java:4.18.1")
@@ -40,4 +41,8 @@ buildscript {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.getByName<Jar>("jar") {
+    enabled = false
 }

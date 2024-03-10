@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>DOH Map - Admin</title>
+
+    <div th:replace="~{fragments/scripts.html :: scripts}"></div>
+</head>
+<body onload="setup()">
+<nav th:replace="~{fragments/navbar.html :: navbar}"></nav>
+<div class="container-fluid">
+    <div class="mx-auto">
+        <h1>Admin functions!</h1>
+        <div th:if="${successText}" th:text="${successText}" class="alert alert-success" role="alert"></div>
+        <div th:if="${failureText}" th:text="${failureText}" class="alert alert-danger" role="alert"></div>
+        <a href="/admin/browserTest">Run browser test (1 browser on page 1 only)</a><br>
+        <a href="/admin/fullRun">Kick off full scrape run.</a>
+    </div>
+</div>
+</body>
+</html>
