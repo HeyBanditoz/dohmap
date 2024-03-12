@@ -71,4 +71,14 @@ public interface ViolationMapper {
 
     @Select("SELECT COUNT(*) FROM violation;")
     int getCount();
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM violation v
+                     JOIN inspection i ON i.id = v.inspection_id
+                     JOIN establishment e on e.id = i.establishment_id
+            WHERE e.type ILIKE '%Restaurants%'
+               OR e.type ILIKE '%Beverage%'
+               OR e.type ILIKE '%breakfast%';""")
+    int getRestaurantBeverageCount();
 }

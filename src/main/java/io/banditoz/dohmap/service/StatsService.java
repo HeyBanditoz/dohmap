@@ -24,8 +24,8 @@ public class StatsService {
         this.establishmentMapper = establishmentMapper;
         this.inspectionMapper = inspectionMapper;
         this.violationMapper = violationMapper;
-        responseCache = Suppliers.memoizeWithExpiration(() -> "Currently storing %,d establishments (%,d food/beverage related), %,d inspections, and %,d violations."
-                        .formatted(establishmentMapper.getCount(), establishmentMapper.getRestaurantBeverageCount(), inspectionMapper.getCount(), violationMapper.getCount()),
+        responseCache = Suppliers.memoizeWithExpiration(() -> "Currently storing %,d establishments (%,d food/beverage related, with %,d inspections and %,d violations.)"
+                        .formatted(establishmentMapper.getCount(), establishmentMapper.getRestaurantBeverageCount(), inspectionMapper.getRestaurantBeverageCount(), violationMapper.getRestaurantBeverageCount()),
                 1, TimeUnit.MINUTES);
     }
 

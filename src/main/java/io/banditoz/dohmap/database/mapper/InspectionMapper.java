@@ -53,4 +53,13 @@ public interface InspectionMapper {
 
     @Select("SELECT COUNT(*) FROM inspection;")
     int getCount();
+
+    @Select("""
+            SELECT COUNT(*)
+            FROM inspection i
+                     JOIN establishment e ON e.id = i.establishment_id
+            WHERE e.type ILIKE '%Restaurants%'
+               OR e.type ILIKE '%Beverage%'
+               OR e.type ILIKE '%breakfast%';""")
+    int getRestaurantBeverageCount();
 }
