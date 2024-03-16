@@ -9,19 +9,20 @@ const greyIcon = new L.Icon({
     shadowSize: [41, 41]
 })
 const baseIcon = L.marker().getIcon(); // TODO surely the default icon is defined somewhere...
+const markers = new Map();
+let leaflet;
 
 function setup() {
-    const map = L.map('map').setView([40.64053, -111.934204], 11);
-
+    leaflet = L.map('map').setView([40.64053, -111.934204], 11);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+    }).addTo(leaflet);
 
     fetchPins()
         .then(layers => {
             $('#loading-progress-bar').hide();
-            L.control.layers(null, Object.fromEntries([...layers.entries()].sort())).addTo(map);
+            L.control.layers(null, Object.fromEntries([...layers.entries()].sort())).addTo(leaflet);
         })
 }
 
@@ -42,11 +43,12 @@ async function fetchPins() {
                     if (!cities.has(marker.establishment.city)) {
                         cities.set(marker.establishment.city, L.layerGroup());
                     }
-                    L.marker([marker.lat, marker.lng], {id: marker.establishment.id, icon: (marker.possiblyGone ? greyIcon : baseIcon)})
+                    const lMarker = L.marker([marker.lat, marker.lng], {id: marker.establishment.id, icon: (marker.possiblyGone ? greyIcon : baseIcon)})
                         // .bindPopup(`<b>${marker.establishment.name} <a target="_blank" title="Open standalone page for this establishment" href="/establishment/${marker.establishment.id}">⧉</a></b><br>${marker.establishment.address}<br>${marker.lat},${marker.lng}`)
                         .addTo(cities.get(marker.establishment.city))
                         .bindTooltip(`<b class="${marker.possiblyGone ? 'gone' : ''}">${marker.establishment.name}${marker.coordinatesModified ? '*' : ''}</b><br>${marker.establishment.address}`)
                         .on('click', (pin) => handlePinClick(pin));
+                    markers.set(marker.establishment.id, lMarker);
                 });
         })
     return cities;

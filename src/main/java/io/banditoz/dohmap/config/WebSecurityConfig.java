@@ -16,8 +16,10 @@ public class WebSecurityConfig {
         http
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
-                ).httpBasic(withDefaults());
+                ).httpBasic(withDefaults())
+                .csrf().disable();
 
         return http.build();
     }

@@ -19,8 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class GoogleMapsService {
@@ -57,6 +60,21 @@ public class GoogleMapsService {
         } else {
             log.debug("{}'s location already exists, skipping GoogleMapsService...", est);
         }
+    }
+
+    @Transactional
+    public void manualLocationUpdate(Establishment establishment, double lat, double lng) {
+        if (establishmentLocationMapper.markCurrentLocationDeleted(establishment.id()) == 0) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Update didn't change any rows");
+        }
+        establishmentLocationMapper.insert(new EstablishmentLocation(
+                UuidCreator.getTimeOrderedEpoch().toString(),
+                null,
+                establishment.id(),
+                lat,
+                lng,
+                Source.MANUAL,
+                null), null);
     }
 
     private void indexEstablishmentGoogleMapsGeocoding(Establishment est) {

@@ -25,4 +25,12 @@ public interface EstablishmentLocationMapper {
             VALUES
               (#{el.id}::uuid, #{el.placeId}, #{el.establishmentId}::uuid, #{el.lat}, #{el.lng}, #{el.source}, #{rawJson}::jsonb)""")
     Integer insert(EstablishmentLocation el, String rawJson);
+
+    @Update("""
+            UPDATE establishment_location
+            SET deleted_on = NOW()
+            WHERE establishment_id = #{establishmentId}::uuid
+              AND deleted_on IS NULL;
+            """)
+    Integer markCurrentLocationDeleted(String establishmentId);
 }

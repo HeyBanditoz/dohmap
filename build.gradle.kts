@@ -22,6 +22,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web:${sbVersion}")
     implementation("org.springframework.boot:spring-boot-starter-security:${sbVersion}")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0")
+    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
     implementation("com.agido:logback-elasticsearch-appender:3.0.10")
     implementation("org.seleniumhq.selenium:selenium-java:4.18.1")

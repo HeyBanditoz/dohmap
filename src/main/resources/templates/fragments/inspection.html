@@ -51,6 +51,60 @@
                 </table>
             </div>
         </div>
+        <div sec:authorize="hasRole('ROLE_ADMIN')">
+            <button th:id="'edit_' + ${establishment.id()}" onclick="edit(this);" class="btn btn-primary">Edit Coordinates</button>
+            <script>
+                function onError(listener, error, estId, element) {
+                    console.error(`Error updating ${estId}'s location, please refresh: ${error}`);
+                    leaflet.off('click'); // TODO WON'T WORK WITH INCASE OTHER CLICK LISTENERS ARE ADDED!
+                    element.classList.remove('btn-warning');
+                    element.classList.add('btn-danger');
+                    element.innerHTML = 'Error!';
+                }
+
+                function edit(e) {
+                    e.classList.add('btn-disabled', 'btn-warning');
+                    e.setAttribute('disabled', true);
+                    e.innerHTML = 'Click on the map to edit location.';
+                    const estId = e.id.replace('edit_', '');
+                    const on = leaflet.on('click', function (maploc) {
+                        // debugger;
+                        if ($(`#${e.id}`).length === 0) {
+                            console.warn(`stale edit for ${e} ${on}`);
+                            return;
+                        }
+                        console.log(maploc);
+                        console.log(e);
+                        fetch(`/api/admin/v1/establishment/manualLocationUpdate/${estId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(maploc.latlng)
+                        })
+                            .then((resp) => {
+                                if (resp.ok) {
+                                    markers.get(estId).setLatLng(maploc.latlng);
+                                    e.classList.remove('btn-disabled', 'btn-warning');
+                                    e.classList.add('btn-success');
+                                    e.innerHTML = 'Success!';
+                                    setTimeout(function () {
+                                        e.classList.remove('btn-success');
+                                        e.innerHTML = 'Edit Coordinates';
+                                        e.removeAttribute('disabled');
+                                    }, 1000);
+                                    leaflet.off('click');
+                                } else {
+                                    onError(on, resp, estId, e);
+                                }
+                            })
+                            .catch((error) => {
+                                onError(on, error, estId, e);
+                            })
+                    })
+                }
+            </script>
+        </div>
         <h2>Inspections</h2>
         <p th:if="${inspections.isEmpty()}">No inspections available :(</p>
         <div th:if="${!inspections.isEmpty()}" th:id="${establishment.id()}" class="accordion">
