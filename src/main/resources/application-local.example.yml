@@ -21,3 +21,4 @@ dohmap:
     sessions: 2
     args: >
       --headless=new
+  origin: https://dohmap.com
