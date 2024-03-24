@@ -21,7 +21,7 @@ public class WebDriverFactory {
     private final Set<WebDriver> drivers = new HashSet<>();
 
     @Autowired
-    public WebDriverFactory(@Value("${dohmap.selenium.args}") List<String> customArgs) {
+    public WebDriverFactory(@Value("${dohmap.selenium.args:}") List<String> customArgs) {
         this.customArgs = customArgs;
     }
 

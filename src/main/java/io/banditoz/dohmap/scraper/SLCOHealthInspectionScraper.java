@@ -16,28 +16,34 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
+
 public class SLCOHealthInspectionScraper implements Runnable {
     private final WebDriver driver;
     private final int pageAssignment;
     private final EstablishmentService establishmentService;
     private final InspectionService inspectionService;
     private final ViolationService violationService;
+    private final Map<String, List<String>> previousInspectionDates;
     private static final Logger log = LoggerFactory.getLogger(SLCOHealthInspectionScraper.class);
 
     public SLCOHealthInspectionScraper(WebDriver driver,
                                        int pageAssignment,
                                        EstablishmentService establishmentService,
                                        InspectionService inspectionService,
-                                       ViolationService violationService) {
+                                       ViolationService violationService,
+                                       Map<String, List<String>> previousInspectionDates) {
         this.driver = driver;
         this.pageAssignment = pageAssignment;
         this.establishmentService = establishmentService;
         this.inspectionService = inspectionService;
         this.violationService = violationService;
+        this.previousInspectionDates = previousInspectionDates;
     }
 
     @Override
     public void run() {
+        long before = System.currentTimeMillis();
         SearchPage page = new SearchPage(driver).navigate();
         page.gotoPage(pageAssignment);
         log.info("ON PAGE {}", pageAssignment);
@@ -48,6 +54,9 @@ public class SLCOHealthInspectionScraper implements Runnable {
             establishmentService.indexEstablishmentRank(est, inspectionHistoryPage.getRank());
             for (Map.Entry<String, Integer> ent : inspectionHistoryPage.getInspections().entrySet()) {
                 inspectionHistoryPage.removeAjax();
+                if (previousInspectionDates.getOrDefault(est.id(), emptyList()).contains(ent.getKey())) {
+                    continue;
+                }
                 InspectionPage inspectionPage = inspectionHistoryPage.clickInspection(ent.getValue());
                 Inspection inspection = inspectionService.getOrCreateInspection(inspectionPage.getInspection().setEstablishmentId(est.id()));
                 List<Violation.Builder> violations = inspectionPage.getViolations();
@@ -59,5 +68,6 @@ public class SLCOHealthInspectionScraper implements Runnable {
             }
             inspectionHistoryPage.back();
         }
+        log.info("This page took {} seconds.", (System.currentTimeMillis() - before) / 1000);
     }
 }

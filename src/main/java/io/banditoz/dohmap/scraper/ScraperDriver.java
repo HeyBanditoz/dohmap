@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ScraperDriver {
@@ -51,7 +54,10 @@ public class ScraperDriver {
         }
     }
 
-    public void kickOffScraper() {
+    public void kickOffScraper(boolean fullRun) {
+        Map<String, List<String>> previousInspections =
+                fullRun ? Collections.emptyMap() : inspectionService.getAllEstablishmentStoredInspectionDates();
+        log.info("Loaded previous inspection dates for {} establishments.", previousInspections.size());
         if (maxSessions <= 0) {
             log.warn("NOT running ScraperDriver as max sessions is {}!", maxSessions);
             return;
@@ -60,18 +66,27 @@ public class ScraperDriver {
             Thread.ofVirtual().start(() -> {
                 for (int i = page.startPage(); i <= page.endPage(); i++) {
                     Thread.currentThread().setName(getThreadName(page, i));
-                    go(page, i);
+                    go(page, i, previousInspections);
                 }
             });
         }
     }
 
     public void runOnePage() {
+        log.info("Running *full* ScraperDriver for one page only...");
+        Thread.ofVirtual().start(() -> {
+            PageConfiguration pc = new PageConfiguration(1, 2);
+            Thread.currentThread().setName(getThreadName(pc, 1));
+            go(pc, 1, Collections.emptyMap());
+        });
+    }
+
+    public void runOnePageLite() {
         log.info("Running ScraperDriver for one page only...");
         Thread.ofVirtual().start(() -> {
             PageConfiguration pc = new PageConfiguration(1, 2);
             Thread.currentThread().setName(getThreadName(pc, 1));
-            go(pc, 1);
+            go(pc, 1, inspectionService.getAllEstablishmentStoredInspectionDates());
         });
     }
 
@@ -79,11 +94,11 @@ public class ScraperDriver {
         return maxSessions;
     }
 
-    private void go(PageConfiguration pc, int page) {
+    private void go(PageConfiguration pc, int page, Map<String, List<String>> previousInspections) {
         WebDriver webDriver = webDriverFactory.buildWebDriver();
         SLCOHealthInspectionScraper s = null;
         try {
-            s = new SLCOHealthInspectionScraper(webDriver, page, establishmentService, inspectionService, violationService);
+            s = new SLCOHealthInspectionScraper(webDriver, page, establishmentService, inspectionService, violationService, previousInspections);
             s.run();
         } catch (Exception ex) {
             log.error("Encountered fatal exception. Will attempt to restart current page {}. This could loop if there are network errors!", page, ex);
@@ -94,7 +109,7 @@ public class ScraperDriver {
             } catch (IOException e) {
                 log.error("Error saving file.", e);
             }
-            Thread.ofVirtual().name(getThreadName(pc, page)).start(() -> go(pc, page));
+            Thread.ofVirtual().name(getThreadName(pc, page)).start(() -> go(pc, page, previousInspections));
         }
         finally {
             webDriverFactory.disposeDriver(webDriver);

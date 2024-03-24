@@ -14,8 +14,13 @@ public class Scheduler {
         this.scraperDriver = scraperDriver;
     }
 
-    @Scheduled(cron = "0 0 22 * * 1-5")
+    @Scheduled(cron = "0 0 22 * * 1-4")
     public void runScraper() {
-        scraperDriver.kickOffScraper();
+        scraperDriver.kickOffScraper(false);
+    }
+
+    @Scheduled(cron = "0 0 22 * * 5")
+    public void runFullScraper() {
+        scraperDriver.kickOffScraper(true);
     }
 }

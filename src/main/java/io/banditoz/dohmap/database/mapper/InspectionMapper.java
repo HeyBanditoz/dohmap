@@ -1,5 +1,6 @@
 package io.banditoz.dohmap.database.mapper;
 
+import io.banditoz.dohmap.model.EstablishmentInspectionDate;
 import io.banditoz.dohmap.model.Inspection;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -62,4 +63,10 @@ public interface InspectionMapper {
                OR e.type ILIKE '%Beverage%'
                OR e.type ILIKE '%breakfast%';""")
     int getRestaurantBeverageCount();
+
+    @Select("""
+            SELECT e.id AS establishment, TO_CHAR(i.inspection_date, 'FMMM/FMDD/YYYY') AS inspectionDate
+            FROM inspection i
+                     JOIN establishment e on e.id = i.establishment_id;""")
+    List<EstablishmentInspectionDate> getEstablishmentInspectionDates();
 }

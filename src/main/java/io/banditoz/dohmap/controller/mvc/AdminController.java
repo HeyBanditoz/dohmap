@@ -32,7 +32,14 @@ public class AdminController {
     @GetMapping("/browserTest")
     public RedirectView browserTest(RedirectAttributes attributes) {
         scraperDriver.runOnePage();
-        attributes.addFlashAttribute("successText", "ScraperDriver started for page 1 only. Please check the logs to monitor success.");
+        attributes.addFlashAttribute("successText", "Full ScraperDriver started for page 1 only. Please check the logs to monitor success.");
+        return new RedirectView("/admin");
+    }
+
+    @GetMapping("/liteBrowserTest")
+    public RedirectView liteBrowserTest(RedirectAttributes attributes) {
+        scraperDriver.runOnePageLite();
+        attributes.addFlashAttribute("successText", "Lite ScraperDriver started for page 1 only. Please check the logs to monitor success.");
         return new RedirectView("/admin");
     }
 
@@ -41,7 +48,7 @@ public class AdminController {
         if (scraperDriver.getMaxSessions() <= 0) {
             attributes.addFlashAttribute("failureText", "Refusing to run ScraperDriver as the configured max sessions is zero.");
         } else {
-            scraperDriver.kickOffScraper();
+            scraperDriver.kickOffScraper(true);
             attributes.addFlashAttribute("successText", "Kicked off full scrape run. Please check the logs to monitor success.");
         }
         return new RedirectView("/admin");
