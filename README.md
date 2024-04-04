@@ -2,6 +2,15 @@
 
 _Mapping Salt Lake County health inspections._
 
+### Turn this:
+<img src='examples/cdp_view.png' width='500'>
+
+### Into this!
+<img src='examples/single_establishment.png' width='500'>
+
+#### Full map view:
+<img src='examples/full_map.png' width='250'>
+
 ## Contributing
 
 You need a Postgres database to run the project.
