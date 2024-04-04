@@ -19,6 +19,8 @@ function setup() {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(leaflet);
 
+    new ResizeObserver(() => leaflet.invalidateSize()).observe($('#map').get()[0]);
+
     fetchPins()
         .then(layers => {
             $('#loading-progress-bar').hide();
