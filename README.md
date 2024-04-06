@@ -33,6 +33,10 @@ A full run (which acts as if there is no data, so it checks all inspections) hap
 health department does change older inspections (this is currently unknown, it would only add violations and not remove
 existing ones.)
 
+For an idea on timings between the two different runs, a single page for a lite run takes a little over 6 minutes,
+whereas a full run will take about 14 minutes. A lite run, on my server, takes about 4 hours to complete. A full run
+takes 10 hours, dividing the pages between 4 browsers.
+
 These can be overridden using the `dohmap.jobs.full-run` and `dohmap.jobs.lite-run` properties.
 
 Selenium was used because there is no API and their frontend/backend seems to _heavily_ sync state using JS. Seriously,
@@ -57,7 +61,6 @@ match, if they don't, a new restaurant is created. Same with all inspection and 
 
 Running the Selenium browsers _shouldn't™_ recreate data, but there are probably bugs. If a restaurant gets a new phone
 number, or changes their name, there'll be a new restaurant as there don't seem to be any exposed unique identifiers.
-TODO maybe a manual merging process?
 
 ## The future?!
 
