@@ -1,7 +1,7 @@
 <div th:fragment="inspection" th:remove="tag">
     <h1>
         <a th:text="'Details for ' + ${establishment.name()}"></a>
-        <a data-toggle="tooltip" data-bs-placement="top"
+        <a th:if="${fragView != null}" data-toggle="tooltip" data-bs-placement="top"
            title="Get a standalone page for this establishment with inspection details."
            target="_blank" th:href="${'/establishment/' + establishment.id()}"> ⧉</a>
     </h1>
