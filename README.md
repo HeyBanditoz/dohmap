@@ -1,6 +1,7 @@
 # DOH Map!
-
 _Mapping Salt Lake County health inspections._
+
+[![Java CI with Gradle](https://github.com/HeyBanditoz/dohmap/actions/workflows/gradle.yml/badge.svg)](https://github.com/HeyBanditoz/dohmap/actions/workflows/gradle.yml)
 
 ### Turn this:
 <img src='examples/cdp_view.png' width='500'>
