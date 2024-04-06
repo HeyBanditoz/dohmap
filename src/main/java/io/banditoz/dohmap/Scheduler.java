@@ -14,12 +14,12 @@ public class Scheduler {
         this.scraperDriver = scraperDriver;
     }
 
-    @Scheduled(cron = "0 0 22 * * 1-4")
+    @Scheduled(cron = "${dohmap.jobs.lite-run}")
     public void runScraper() {
         scraperDriver.kickOffScraper(false);
     }
 
-    @Scheduled(cron = "0 0 22 * * 5")
+    @Scheduled(cron = "${dohmap.jobs.full-run}")
     public void runFullScraper() {
         scraperDriver.kickOffScraper(true);
     }

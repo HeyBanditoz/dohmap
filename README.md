@@ -16,7 +16,8 @@ _Mapping Salt Lake County health inspections._
 You need a Postgres database to run the project.
 
 Copy the `src/main/resources/application-local.example.yml` file to `src/main/resources/application.yml` and set up your
-database. If you want to run the Selenium indexers, set `dohmap.selenium.sessions` to be over 0.
+database. If you want to run the Selenium indexers, set `dohmap.selenium.sessions` to be over 0, set a login, and head
+to `/admin` to test the scrapers.
 
 ## Brief
 
@@ -24,9 +25,15 @@ This projects ingests data from Salt Lake
 County's [health inspection database](https://public.cdpehs.com/UTEnvPbl/VW_EST_PUBLIC/ShowVW_EST_PUBLICTablePage.aspx)
 by means of scraping most of the data available on the site through concurrent Selenium browser sessions.
 
-Right now, the project is still in development, and the browser sessions are only ran on startup, controlled by the
-`dohmap.selenium.sessions` property. I want to change this to be nightly though If I ever deploy it somewhere. **It's
-not ready for public use yet!**
+The scrapers are kicked off using a cronjob, which, by default, starts every Monday through Thursday at 21:00 local
+system time for a quick (lite) run. The lite run does not check for new violations on inspections already in the
+database.
+
+A full run (which acts as if there is no data, so it checks all inspections) happens at Friday at 21:00, in-case the
+health department does change older inspections (this is currently unknown, it would only add violations and not remove
+existing ones.)
+
+These can be overridden using the `dohmap.jobs.full-run` and `dohmap.jobs.lite-run` properties.
 
 Selenium was used because there is no API and their frontend/backend seems to _heavily_ sync state using JS. Seriously,
 to view an inspection page calls some JS function that only increments an ID based on the index of the row.
@@ -58,6 +65,5 @@ TODO maybe a manual merging process?
 * Alerts if establishments you select match criteria (critical violations on new inspection)
     * Discord alert destination
 * Merge establishments
-* Edit locations
 * Maybe ingest [Utah County inspection data](http://www.inspectionsonline.us/foodsafety/ututahprovo/search.htm) (whole
   other website, would need to adjust the data model a good bit to support it.)
