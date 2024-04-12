@@ -59,7 +59,7 @@ public class EstablishmentPinService {
             double newLat = pin.lat() + radius * cos(angleRad);
             double newLng = pin.lng() + radius * sin(angleRad);
 
-            modifiedPins.add(new Pin(pin.establishment(), newLat, newLng, pin.lastRank(), true, pin.possiblyGone()));
+            modifiedPins.add(new Pin(pin.establishment(), newLat, newLng, pin.lastRank(), true, pin.possiblyGone(), pin.lastInspection()));
         }
         return modifiedPins;
     }

@@ -7,7 +7,17 @@ const greyIcon = new L.Icon({
     popupAnchor: [1, -34],
     tooltipAnchor: [16, -28],
     shadowSize: [41, 41]
-})
+});
+const greenIcon = new L.Icon({
+    iconUrl: "/static/leaflet/images/marker-icon-yellow.png",
+    iconRetinaUrl: "/static/leaflet/images/marker-icon-2x-yellow.png",
+    shadowUrl: "/static/leaflet/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41]
+});
 const baseIcon = L.marker().getIcon(); // TODO surely the default icon is defined somewhere...
 const markers = new Map();
 let leaflet;
@@ -45,7 +55,17 @@ async function fetchPins() {
                     if (!cities.has(marker.establishment.city)) {
                         cities.set(marker.establishment.city, L.layerGroup());
                     }
-                    const lMarker = L.marker([marker.lat, marker.lng], {id: marker.establishment.id, icon: (marker.possiblyGone ? greyIcon : baseIcon)})
+                    let icon;
+                    if (!marker.possiblyGone) {
+                        if (isAfterDaysAgo(new Date(marker.lastInspection), 7)) {
+                            icon = greenIcon;
+                        } else {
+                            icon = baseIcon;
+                        }
+                    } else {
+                        icon = greyIcon;
+                    }
+                    const lMarker = L.marker([marker.lat, marker.lng], {id: marker.establishment.id, icon: icon})
                         // .bindPopup(`<b>${marker.establishment.name} <a target="_blank" title="Open standalone page for this establishment" href="/establishment/${marker.establishment.id}">⧉</a></b><br>${marker.establishment.address}<br>${marker.lat},${marker.lng}`)
                         .addTo(cities.get(marker.establishment.city))
                         .bindTooltip(`<b class="${marker.possiblyGone ? 'gone' : ''}">${marker.establishment.name}${marker.coordinatesModified ? '*' : ''}</b><br>${marker.establishment.address}`)
@@ -61,4 +81,8 @@ function handlePinClick(e) {
         .then(res => res.text())
         .then(html => $('#inspection').html(html))
         .then(_ => Init.page())
+}
+
+function isAfterDaysAgo(today, days) {
+    return today >= new Date().setDate(today.getDate() - days);
 }
