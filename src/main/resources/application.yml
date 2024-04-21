@@ -13,3 +13,5 @@ dohmap:
   jobs:
     full-run: 0 0 22 * * 5
     lite-run: 0 0 22 * * 1-4
+  google-maps:
+    allowed-establishment-types: Restaurants,Beverage,Breakfast,Food Permit

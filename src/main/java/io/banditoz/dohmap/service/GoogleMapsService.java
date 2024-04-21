@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Service
 public class GoogleMapsService {
     private final EstablishmentLocationMapper establishmentLocationMapper;
@@ -32,6 +34,7 @@ public class GoogleMapsService {
     private final GoogleMapsPlacesClient googleMapsPlacesClient;
     private final ObjectMapper objectMapper;
     private final boolean usePlacesApi;
+    private final List<String> allowedTypes;
     private static final Logger log = LoggerFactory.getLogger(GoogleMapsService.class);
 
     @Autowired
@@ -39,18 +42,31 @@ public class GoogleMapsService {
                              GoogleMapsClient googleMapsClient,
                              GoogleMapsPlacesClient googleMapsPlacesClient,
                              ObjectMapper objectMapper,
-                             @Value("${dohmap.google-maps.use-places-api:false}") boolean usePlacesApi) {
+                             @Value("${dohmap.google-maps.use-places-api:false}") boolean usePlacesApi,
+                             @Value("${dohmap.google-maps.allowed-establishment-types:false}") List<String> allowedTypes) {
         this.establishmentLocationMapper = establishmentLocationMapper;
         this.googleMapsClient = googleMapsClient;
         this.googleMapsPlacesClient = googleMapsPlacesClient;
         this.objectMapper = objectMapper;
         this.usePlacesApi = usePlacesApi;
+        this.allowedTypes = allowedTypes.stream().map(String::toUpperCase).toList();
 
         log.info("Using Google Maps " + (usePlacesApi ? "places" : "geocoding") + " API for geo lookups.");
+        log.info("Allowed establishment types (if contains, case ignored) whose location will be searched {}", this.allowedTypes);
     }
 
     @Async
     public void indexEstablishment(Establishment est) {
+        allowedTypes.stream()
+                .filter(allowedType -> est.type().toUpperCase().contains(allowedType))
+                .findFirst()
+                .ifPresentOrElse(
+                        ignored -> _indexEstablishment(est),
+                        () -> log.debug("Establishment {} wasn't in any of the allowed establishment types: {}", est, allowedTypes)
+                );
+    }
+
+    private void _indexEstablishment(Establishment est) {
         if (establishmentLocationMapper.getByEstablishmentId(est.id()) == null) {
             if (usePlacesApi) {
                 indexEstablishmentPlacesApi(est);
