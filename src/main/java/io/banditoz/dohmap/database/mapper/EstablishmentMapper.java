@@ -35,7 +35,8 @@ public interface EstablishmentMapper {
                    type,
                    lat,
                    lng,
-                   (SELECT rank FROM establishment_rank er WHERE er.establishment_id = e.id ORDER BY er.id DESC LIMIT 1) AS lastRank,
+                   null,
+                   -- (SELECT rank FROM establishment_rank er WHERE er.establishment_id = e.id ORDER BY er.id DESC LIMIT 1) AS lastRank,
                    (SELECT last_seen FROM establishment ORDER BY last_seen DESC LIMIT 1 OFFSET 50) - INTERVAL '1 day' > e.last_seen AS possiblyGone,
                    (SELECT TO_CHAR(inspection_date, 'YYYY-MM-DD') FROM inspection i WHERE i.establishment_id = e.id ORDER BY inspection_date DESC LIMIT 1) AS lastInspection
             FROM establishment e
