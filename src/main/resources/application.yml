@@ -15,3 +15,14 @@ dohmap:
     lite-run: 0 0 22 * * 1-4
   google-maps:
     allowed-establishment-types: Restaurants,Beverage,Breakfast,Food Permit
+  city-mappings:
+    ['AMERIAN FORK']: AMERICAN FORK
+    ['CEDER HILLS']: CEDAR HILLS
+    ['COPPERTON TS']: COPPERTON
+    ['EAGLE MTN']: EAGLE MOUNTAIN
+    ['KEARNS TS']: KEARNS
+    ['MILLCREEK TS']: MILLCREEK
+    ['PLEASANTE GROVE']: PLEASANT GROVE
+    ['PLEASANT GROVCE']: PLEASANT GROVE
+    ['PLEASAT GROVE']: PLEASANT GROVE
+    ['PROVO CANYON']: PROVO

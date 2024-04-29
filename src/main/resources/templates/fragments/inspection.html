@@ -17,9 +17,17 @@
                         <td>Type</td>
                         <td th:text="${establishment.type()}"></td>
                     </tr>
-                    <tr>
+                    <tr th:if="${establishment.isSaltLakeCounty()}">
                         <td data-toggle="tooltip" data-placement="top" title="The last seen rank as available on the establishment-level on the SLCO health inspection site.">Last Rank</td>
                         <td th:text="${lastRank == null ? '???' : lastRank + '%'}"></td>
+                    </tr>
+                    <tr th:if="${establishment.isUtahCounty()}">
+                        <td data-toggle="tooltip" data-placement="top" title="The identifier Utah County has for this establishment.">UTCO's ID</td>
+                        <td>
+                            <a th:href="${'https://www.inspectionsonline.us/UT/UtahProvo/inspect.nsf/vw_InspectionsPubSumm-NT?OpenView&RestrictToCategory=' + establishment.sysId()}"
+                               th:text="${establishment.sysId()}"
+                               target="_blank"></a>
+                        </td>
                     </tr>
                 </table>
             </div>
@@ -114,7 +122,7 @@
                             type="button" data-bs-toggle="collapse"
                             th:data-bs-target="'#c_' + ${i.i().id()}"
                             th:aria-controls="'c_' + ${i.i().id()}"
-                            th:text="${i.i().inspectionDate() + ', Type: ' + i.i().inspectionType() + ', Score: ' + i.i().score() + ', ' + i.critCount() + ' crit and ' + i.nonCritCount() + ' non-crit.'}">
+                            th:text="${i.i().inspectionDate() + ', Type: ' + i.i().inspectionType() + (establishment.isSaltLakeCounty() ? ', Score: ' + i.i().score() + ', ' : ', ') + i.critCount() + ' crit and ' + i.nonCritCount() + ' non-crit.'}">
                     </button>
                 </h2>
                 <div th:id="'c_' + ${i.i().id()}" class="accordion-collapse collapse"
@@ -125,20 +133,20 @@
                             <tr class="table-success">
                                 <th>Code</th>
                                 <th>Observed Violations</th>
-                                <th>Points</th>
+                                <th th:if="${establishment.isSaltLakeCounty()}">Points</th>
                                 <th>Critical</th>
-                                <th>Occurrences</th>
+                                <th th:if="${establishment.isSaltLakeCounty()}">Occurrences</th>
                                 <th data-toggle="tooltip" data-placement="top" title="Corrected on site during inspection.">COS</th>
-                                <th data-toggle="tooltip" data-placement="top" title="Public Health Rationale (Why is this a violation?)">PHR</th>
+                                <th th:if="${establishment.isSaltLakeCounty()}" data-toggle="tooltip" data-placement="top" title="Public Health Rationale (Why is this a violation?)">PHR</th>
                             </tr>
                             <tr th:each="v : ${i.v()}" th:class="${v.critical() ? 'table-danger' : 'table-primary'}">
                                 <td th:text="${v.code()}"></td>
                                 <td th:text="${v.observed()}"></td>
-                                <td th:text="${v.points()}"></td>
+                                <td th:if="${establishment.isSaltLakeCounty()}" th:text="${v.points()}"></td>
                                 <td th:text="${v.critical()}"></td>
-                                <td th:text="${v.occurrences()}"></td>
+                                <td th:if="${establishment.isSaltLakeCounty()}" th:text="${v.occurrences()}"></td>
                                 <td th:text="${v.correctedOnSite()}"></td>
-                                <td th:text="${v.publicHealthRationale()}"></td>
+                                <td th:if="${establishment.isSaltLakeCounty()}" th:text="${v.publicHealthRationale()}"></td>
                             </tr>
                         </table>
                     </div>

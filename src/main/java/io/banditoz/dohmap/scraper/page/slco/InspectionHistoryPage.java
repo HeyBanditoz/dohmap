@@ -1,5 +1,6 @@
 package io.banditoz.dohmap.scraper.page.slco;
 
+import io.banditoz.dohmap.model.DataSource;
 import io.banditoz.dohmap.model.Establishment;
 import io.banditoz.dohmap.scraper.page.base.Page;
 import org.openqa.selenium.By;
@@ -7,6 +8,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +21,7 @@ public class InspectionHistoryPage extends Page<InspectionHistoryPage> {
     private final By establishmentInformation = By.cssSelector("#ctl00_PageContent_VW_EST_PUBLIC2RecordControlPanel > table:nth-child(1)");
 
     private static final Pattern CITY_STATE_ZIP = Pattern.compile("(.*),\\s+(\\w+)\\s+(\\d+)");
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("M/d/yyyy");
 
     public InspectionHistoryPage(WebDriver driver) {
         super(driver);
@@ -46,6 +50,7 @@ public class InspectionHistoryPage extends Page<InspectionHistoryPage> {
         String phone = cols.get(3).findElements(By.tagName("td")).get(1).getText();
         builder.setPhone(phone.isBlank() ? null : phone);
         builder.setType(cols.get(4).findElements(By.tagName("td")).get(1).getText());
+        builder.setSource(DataSource.SALT_LAKE_COUNTY_CDP);
         return builder;
     }
 
@@ -75,13 +80,13 @@ public class InspectionHistoryPage extends Page<InspectionHistoryPage> {
     }
 
     /** Map of Date, Pagenum. */
-    public Map<String, Integer> getInspections() {
-        Map<String, Integer> insps = new LinkedHashMap<>(); // maintain order for easier debugging
+    public Map<LocalDate, Integer> getInspections() {
+        Map<LocalDate, Integer> insps = new LinkedHashMap<>(); // maintain order for easier debugging
         List<WebElement> rows = driver.findElements(By.cssSelector("#INSPECTIONTableControlGrid > tbody > tr:not(.tch)"));
         for (int i = rows.size() - 1; i >= 0; i--) {
             WebElement row = rows.get(i);
             List<WebElement> cols = row.findElements(By.tagName("td"));
-            String date = cols.get(10).getText();
+            LocalDate date = LocalDate.parse(cols.get(10).getText(), DTF);
             if (insps.get(date) != null) {
                 log.warn("Establishment {} has inspections that fall under the same day. " +
                         "This is not allowed under the current data model. Choosing the newest by date...", getEstablishmentInfo().build());

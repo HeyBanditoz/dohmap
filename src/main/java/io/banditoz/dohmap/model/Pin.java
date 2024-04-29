@@ -9,6 +9,12 @@ public record Pin(Establishment establishment, Double lat, Double lng, Integer l
     @SuppressWarnings("unused") // for mybatis
     public Pin(String id, String name, String address, String city, String state, String zip, String phone, String type,
                Double lat, Double lng, Integer lastRank, boolean possiblyGone, String lastInspection) {
-        this(new Establishment(id, name, address, city, state, zip, phone, type, null), lat, lng, lastRank, false, possiblyGone, lastInspection);
+        this(new Establishment(id, name, address, city, state, zip, phone, type, null, null, null), lat, lng, lastRank, false, possiblyGone, lastInspection);
+    }
+
+    public static Pin withCity(Pin pin, String city) {
+        Establishment oe = pin.establishment;
+        Establishment e = new Establishment(oe.id(), oe.name(), oe.address(), city, oe.state(), oe.zip(), oe.phone(), oe.type(), oe.lastSeen(), oe.sysId(), oe.source());
+        return new Pin(e, pin.lat, pin.lng, pin.lastRank, pin.coordinatesModified, pin.possiblyGone, pin.lastInspection);
     }
 }

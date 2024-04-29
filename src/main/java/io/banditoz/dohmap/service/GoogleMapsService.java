@@ -62,7 +62,7 @@ public class GoogleMapsService {
                 .findFirst()
                 .ifPresentOrElse(
                         ignored -> _indexEstablishment(est),
-                        () -> log.debug("Establishment {} wasn't in any of the allowed establishment types: {}", est, allowedTypes)
+                        () -> log.debug("{} wasn't in any of the allowed establishment types: {}", est, allowedTypes)
                 );
     }
 
@@ -135,6 +135,7 @@ public class GoogleMapsService {
     private void insert(EstablishmentLocation estLoc, Object json) {
         try {
             establishmentLocationMapper.insert(estLoc, objectMapper.writeValueAsString(json));
+            log.debug("Indexed {}'s location using Google Maps", estLoc.establishmentId());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

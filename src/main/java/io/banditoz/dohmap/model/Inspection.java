@@ -2,13 +2,14 @@ package io.banditoz.dohmap.model;
 
 import java.time.LocalDate;
 
-public record Inspection(String id, String establishmentId, LocalDate inspectionDate, String inspectionType, Integer score) implements Entity {
+public record Inspection(String id, String establishmentId, LocalDate inspectionDate, String inspectionType, Integer score, String sysId) implements Entity {
     public static final class Builder {
         private String id;
         private String establishmentId;
         private LocalDate inspectionDate;
         private String inspectionType;
         private Integer score;
+        private String sysId;
 
         public Builder() {
         }
@@ -38,8 +39,13 @@ public record Inspection(String id, String establishmentId, LocalDate inspection
             return this;
         }
 
+        public Builder setSysId(String val) {
+            sysId = val;
+            return this;
+        }
+
         public Inspection build() {
-            return new Inspection(id, establishmentId, inspectionDate, inspectionType, score);
+            return new Inspection(id, establishmentId, inspectionDate, inspectionType, score, sysId);
         }
     }
 }

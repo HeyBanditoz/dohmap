@@ -69,5 +69,3 @@ number, or changes their name, there'll be a new restaurant as there don't seem 
 * Alerts if establishments you select match criteria (critical violations on new inspection)
     * Discord alert destination
 * Merge establishments
-* Maybe ingest [Utah County inspection data](http://www.inspectionsonline.us/foodsafety/ututahprovo/search.htm) (whole
-  other website, would need to adjust the data model a good bit to support it.)

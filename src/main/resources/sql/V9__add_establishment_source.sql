@@ -1,0 +1,5 @@
+ALTER TABLE establishment
+    ADD COLUMN source SMALLINT NOT NULL DEFAULT 0;
+
+ALTER TABLE establishment
+    ALTER COLUMN source DROP DEFAULT;

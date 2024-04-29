@@ -19,7 +19,14 @@
         <div th:if="${failureText}" th:text="${failureText}" class="alert alert-danger" role="alert"></div>
         <a href="/admin/browserTest">Run browser test (1 browser on page 1 only)</a><br>
         <a href="/admin/liteBrowserTest">Run lite browser test (1 browser on page 1 only)</a><br>
-        <a href="/admin/fullRun">Kick off full scrape run.</a>
+        <a href="/admin/fullRun">Kick off full scrape run.</a><br>
+        <a id="utcoTest"
+           onclick="$('#utcoTest').attr('href', `/admin/utcoTest?letters=${prompt('Enter letters to search UTCO for')}`);"
+           href="/admin/utcoTest">Test UTCO's health inspection scraper.</a><br>
+        <a id="utcoTestStartAt"
+           onclick="$('#utcoTestStartAt').attr('href', `/admin/utcoTestStartAt?letters=${prompt('Enter letters to start UTCO at')}`);"
+           href="/admin/utcoTestStartAt">Start UTCO's health inspection scraper at a two letter pair.</a><br>
+        <a href="/admin/fullUtcoTest">Kick off full UTCO scrape run.</a><br>
     </div>
 </div>
 </body>

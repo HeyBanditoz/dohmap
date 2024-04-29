@@ -16,15 +16,25 @@ import static java.lang.Math.*;
 @Service
 public class EstablishmentPinService {
     private final EstablishmentMapper establishmentMapper;
+    private final CityRemapper cityRemapper;
 
     @Autowired
-    public EstablishmentPinService(EstablishmentMapper establishmentMapper) {
+    public EstablishmentPinService(EstablishmentMapper establishmentMapper,
+                                   CityRemapper cityRemapper) {
         this.establishmentMapper = establishmentMapper;
+        this.cityRemapper = cityRemapper;
     }
 
     public List<Pin> getPins() {
         Map<List<Double>, List<Pin>> coordinatePinPair = establishmentMapper.getPins()
                 .stream()
+                .map(pin -> {
+                    if (cityRemapper.shouldRename(pin.establishment().city())) {
+                        return Pin.withCity(pin, cityRemapper.rename(pin.establishment().city()));
+                    } else {
+                        return pin;
+                    }
+                })
                 .sorted(Comparator.comparing(o -> o.establishment().name()))
                 .collect(Collectors.groupingBy(pin -> List.of(pin.lat(), pin.lng())));
         coordinatePinPair.forEach((coords, pins) -> {

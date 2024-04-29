@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.Instant;
 
 public record Establishment(String id, String name, String address, String city, String state, String zip, String phone,
-                            String type, Instant lastSeen) implements Entity {
+                            String type, Instant lastSeen, String sysId, DataSource source) implements Entity {
     @JsonIgnore
     public String getFullAddress() {
         return "%s, %s, %s %s".formatted(address, city, state, zip);
@@ -14,6 +14,16 @@ public record Establishment(String id, String name, String address, String city,
     @JsonIgnore
     public String getNameAndFullAddress() {
         return "%s, %s".formatted(name, getFullAddress());
+    }
+
+    @JsonIgnore
+    public boolean isSaltLakeCounty() {
+        return source == DataSource.SALT_LAKE_COUNTY_CDP;
+    }
+
+    @JsonIgnore
+    public boolean isUtahCounty() {
+        return source == DataSource.UTAH_COUNTY_PARAGON;
     }
 
     public static final class Builder {
@@ -25,6 +35,8 @@ public record Establishment(String id, String name, String address, String city,
         private String zip;
         private String phone;
         private String type;
+        private String sysId;
+        private DataSource source;
 
         public Builder() {
         }
@@ -69,8 +81,18 @@ public record Establishment(String id, String name, String address, String city,
             return this;
         }
 
+        public Builder setSysId(String val) {
+            sysId = val;
+            return this;
+        }
+
+        public Builder setSource(DataSource val) {
+            source = val;
+            return this;
+        }
+
         public Establishment build() {
-            return new Establishment(id, name, address, city, state, zip, phone, type, null);
+            return new Establishment(id, name, address, city, state, zip, phone, type, null, sysId, source);
         }
     }
 }

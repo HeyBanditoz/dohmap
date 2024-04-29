@@ -9,6 +9,8 @@ import io.banditoz.dohmap.model.EstablishmentInspectionViolation;
 import io.banditoz.dohmap.model.dto.EstablishmentDto;
 import io.banditoz.dohmap.model.dto.EstablishmentInspectionViolationDto;
 import io.banditoz.dohmap.model.dto.InspectionDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ public class EstablishmentService {
     private final ViolationService violationService;
     private final GoogleMapsService googleMapsService;
     private final Supplier<Instant> lastSeenCache;
+    private static final Logger log = LoggerFactory.getLogger(EstablishmentService.class);
 
     @Autowired
     public EstablishmentService(EstablishmentMapper establishmentMapper,
@@ -46,7 +49,9 @@ public class EstablishmentService {
         if (est == null) {
             est = candidate.setId(UuidCreator.getTimeOrderedEpoch().toString()).build();
             establishmentMapper.insertEstablishment(est);
+            log.debug("{} was created!", est);
         } else {
+            log.debug("{} already exists. Updating last seen...", est);
             establishmentMapper.updateLastSeen(est);
         }
         // also fetch location from Google Maps, if needed

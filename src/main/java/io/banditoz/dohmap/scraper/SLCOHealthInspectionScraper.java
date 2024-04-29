@@ -9,10 +9,12 @@ import io.banditoz.dohmap.scraper.page.slco.SearchPage;
 import io.banditoz.dohmap.service.EstablishmentService;
 import io.banditoz.dohmap.service.InspectionService;
 import io.banditoz.dohmap.service.ViolationService;
+import io.banditoz.dohmap.utils.DateSysId;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +26,7 @@ public class SLCOHealthInspectionScraper implements Runnable {
     private final EstablishmentService establishmentService;
     private final InspectionService inspectionService;
     private final ViolationService violationService;
-    private final Map<String, List<String>> previousInspectionDates;
+    private final Map<String, List<DateSysId>> previousInspectionDates;
     private static final Logger log = LoggerFactory.getLogger(SLCOHealthInspectionScraper.class);
 
     public SLCOHealthInspectionScraper(WebDriver driver,
@@ -32,7 +34,7 @@ public class SLCOHealthInspectionScraper implements Runnable {
                                        EstablishmentService establishmentService,
                                        InspectionService inspectionService,
                                        ViolationService violationService,
-                                       Map<String, List<String>> previousInspectionDates) {
+                                       Map<String, List<DateSysId>> previousInspectionDates) {
         this.driver = driver;
         this.pageAssignment = pageAssignment;
         this.establishmentService = establishmentService;
@@ -52,9 +54,9 @@ public class SLCOHealthInspectionScraper implements Runnable {
             InspectionHistoryPage inspectionHistoryPage = page.ready().clickEstablishmentInspections(j);
             Establishment est = establishmentService.getOrCreateEstablishment(inspectionHistoryPage.getEstablishmentInfo());
             establishmentService.indexEstablishmentRank(est, inspectionHistoryPage.getRank());
-            for (Map.Entry<String, Integer> ent : inspectionHistoryPage.getInspections().entrySet()) {
+            for (Map.Entry<LocalDate, Integer> ent : inspectionHistoryPage.getInspections().entrySet()) {
                 inspectionHistoryPage.removeAjax();
-                if (previousInspectionDates.getOrDefault(est.id(), emptyList()).contains(ent.getKey())) {
+                if (previousInspectionDates.getOrDefault(est.id(), emptyList()).contains(DateSysId.ofDate(ent.getKey()))) {
                     continue;
                 }
                 InspectionPage inspectionPage = inspectionHistoryPage.clickInspection(ent.getValue());
