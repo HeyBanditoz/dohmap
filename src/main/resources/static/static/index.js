@@ -84,5 +84,5 @@ function handlePinClick(e) {
 }
 
 function isAfterDaysAgo(today, days) {
-    return today >= new Date().setDate(today.getDate() - days);
+    return today >= new Date().getTime() - (days * 24 * 60 * 60 * 1000);
 }
