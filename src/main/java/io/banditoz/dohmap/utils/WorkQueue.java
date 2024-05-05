@@ -37,7 +37,7 @@ public class WorkQueue<T> {
      * Offsets the work queue to the first occurrence of <code>item</code>.
      *
      * @param item First occurrence to offset to.
-     * @return The number of skipped elements in the array. Returns zero if the element wasn't found. The cursor was not
+     * @return The number of skipped elements in the array. Returns -1 if the element wasn't found. The cursor was not
      * advanced in this case.
      */
     public int offsetToFirstOccurrence(T item) {
@@ -50,7 +50,7 @@ public class WorkQueue<T> {
                 }
             }
         }
-        return 0;
+        return -1;
     }
 
     /**
