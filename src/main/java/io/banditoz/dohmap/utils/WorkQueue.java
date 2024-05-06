@@ -33,6 +33,14 @@ public class WorkQueue<T> {
         }
     }
 
+    public static WorkQueue<Integer> fillOneToN(int n) {
+        Integer[] arr = new Integer[n];
+        for (int i = 1; i <= n; i++) {
+            arr[i - 1] = i;
+        }
+        return new WorkQueue<>(arr);
+    }
+
     /**
      * Offsets the work queue to the first occurrence of <code>item</code>.
      *

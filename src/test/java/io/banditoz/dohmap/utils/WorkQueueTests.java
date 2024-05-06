@@ -60,6 +60,16 @@ class WorkQueueTests {
     }
 
     @Test
+    void testWorkQueue_intFilling() {
+        WorkQueue<Integer> queue = WorkQueue.fillOneToN(3);
+        assertThat(queue.getNextItem()).isEqualTo(1);
+        assertThat(queue.getNextItem()).isEqualTo(2);
+        assertThat(queue.getNextItem()).isEqualTo(3);
+        assertThat(queue.getNextItem()).isNull();
+        assertThat(queue.getNextItem()).isNull();
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void testWorkQueue_noElement() {
         assertThatThrownBy(WorkQueue::new).isInstanceOf(IllegalArgumentException.class);

@@ -59,6 +59,17 @@ public class AdminController {
         return new RedirectView("/admin");
     }
 
+    @GetMapping("/liteRun")
+    public RedirectView liteRun(RedirectAttributes attributes) {
+        if (scraperDriver.getMaxSessions() <= 0) {
+            attributes.addFlashAttribute("failureText", "Refusing to run ScraperDriver as the configured max sessions is zero.");
+        } else {
+            scraperDriver.kickOffScraper(false);
+            attributes.addFlashAttribute("successText", "Kicked off lite scrape run. Please check the logs to monitor success.");
+        }
+        return new RedirectView("/admin");
+    }
+
     @GetMapping("/utcoTest")
     public RedirectView utcoTest(@RequestParam String letters, RedirectAttributes attributes) {
         utcoScraperDriver.goOnlyWithLetters(letters);
@@ -77,7 +88,7 @@ public class AdminController {
     @GetMapping("/fullUtcoTest")
     public RedirectView utcoTest(RedirectAttributes attributes) {
         utcoScraperDriver.go(null);
-        attributes.addFlashAttribute("successText", "Full UTCOScraperDriver started for page 1 only. Please check the logs to monitor success.");
+        attributes.addFlashAttribute("successText", "Full UTCOScraperDriver started. Please check the logs to monitor success.");
         return new RedirectView("/admin");
     }
 }

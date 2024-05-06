@@ -2,11 +2,11 @@ package io.banditoz.dohmap.scraper;
 
 import io.banditoz.dohmap.model.DataSource;
 import io.banditoz.dohmap.scraper.page.slco.SearchPage;
-import io.banditoz.dohmap.scraper.page.base.PageConfiguration;
 import io.banditoz.dohmap.service.EstablishmentService;
 import io.banditoz.dohmap.service.InspectionService;
 import io.banditoz.dohmap.service.ViolationService;
 import io.banditoz.dohmap.utils.DateSysId;
+import io.banditoz.dohmap.utils.WorkQueue;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,17 +60,25 @@ public class ScraperDriver {
     public void kickOffScraper(boolean fullRun) {
         Map<String, List<DateSysId>> previousInspections =
                 fullRun ? Collections.emptyMap() : inspectionService.getAllEstablishmentStoredInspectionDates(DataSource.SALT_LAKE_COUNTY_CDP);
-        log.info("Loaded previous inspection dates for {} establishments.", previousInspections.size());
+        log.info("Loaded previous inspection dates for {} establishments." +
+                " If an inspection is encountered with an already stored date by its establishment, it will be skipped.", previousInspections.size());
         if (maxSessions <= 0) {
             log.warn("NOT running ScraperDriver as max sessions is {}!", maxSessions);
             return;
         }
-        for (PageConfiguration page : PageConfiguration.dividePages(getMaxPages(), maxSessions)) {
+        WorkQueue<Integer> queue = WorkQueue.fillOneToN(getMaxPages());
+        for (int i = 0; i < maxSessions; i++) {
             Thread.ofVirtual().start(() -> {
-                for (int i = page.startPage(); i <= page.endPage(); i++) {
-                    Thread.currentThread().setName(getThreadName(page, i));
-                    go(page, i, previousInspections);
-                }
+                do {
+                    Integer page = queue.getNextItem();
+                    if (page == null) {
+                        log.info("No more work.");
+                        break;
+                    }
+                    Thread.currentThread().setName(getThreadName(page));
+                    go(page, previousInspections);
+                } while (queue.hasMoreWork());
+                log.info("No more work.");
             });
         }
     }
@@ -77,18 +86,16 @@ public class ScraperDriver {
     public void runOnePage() {
         log.info("Running *full* ScraperDriver for one page only...");
         Thread.ofVirtual().start(() -> {
-            PageConfiguration pc = new PageConfiguration(1, 2);
-            Thread.currentThread().setName(getThreadName(pc, 1));
-            go(pc, 1, Collections.emptyMap());
+            Thread.currentThread().setName(getThreadName(1));
+            go(1, Collections.emptyMap());
         });
     }
 
     public void runOnePageLite() {
         log.info("Running ScraperDriver for one page only...");
         Thread.ofVirtual().start(() -> {
-            PageConfiguration pc = new PageConfiguration(1, 2);
-            Thread.currentThread().setName(getThreadName(pc, 1));
-            go(pc, 1, inspectionService.getAllEstablishmentStoredInspectionDates(DataSource.SALT_LAKE_COUNTY_CDP));
+            Thread.currentThread().setName(getThreadName(1));
+            go(1, inspectionService.getAllEstablishmentStoredInspectionDates(DataSource.SALT_LAKE_COUNTY_CDP));
         });
     }
 
@@ -96,7 +103,7 @@ public class ScraperDriver {
         return maxSessions;
     }
 
-    private void go(PageConfiguration pc, int page, Map<String, List<DateSysId>> previousInspections) {
+    private void go(int page, Map<String, List<DateSysId>> previousInspections) {
         WebDriver webDriver = webDriverFactory.buildWebDriver();
         SLCOHealthInspectionScraper s = null;
         try {
@@ -111,14 +118,14 @@ public class ScraperDriver {
             } catch (IOException e) {
                 log.error("Error saving file.", e);
             }
-            Thread.ofVirtual().name(getThreadName(pc, page)).start(() -> go(pc, page, previousInspections));
+            Thread.ofVirtual().name(getThreadName(page)).start(() -> go(page, previousInspections));
         }
         finally {
             webDriverFactory.disposeDriver(webDriver);
         }
     }
 
-    private String getThreadName(PageConfiguration pc, int cc) {
-        return "sl-" + cc + "-" + pc.tName();
+    private String getThreadName(int cc) {
+        return "sl-" + cc + "-" + StringUtils.randomAlphanumeric(4);
     }
 }
