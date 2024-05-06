@@ -10,13 +10,13 @@ import io.banditoz.dohmap.utils.WorkQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class UTCOScraperDriver {
@@ -24,7 +24,6 @@ public class UTCOScraperDriver {
     private final EstablishmentService establishmentService;
     private final InspectionService inspectionService;
     private final ViolationService violationService;
-    private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(0);
 
     public UTCOScraperDriver(EstablishmentService establishmentService,
                                        InspectionService inspectionService,
@@ -44,7 +43,7 @@ public class UTCOScraperDriver {
         }
         Set<String> seenEstablishments = ConcurrentHashMap.newKeySet();
         for (int i = 0; i < 3; i++) {
-            Thread.ofVirtual().name("utco-" + THREAD_COUNTER.getAndIncrement()).start(() -> {
+            Thread.ofVirtual().start(() -> {
                try {
                     do {
                         String letters = queue.getNextItem();
@@ -52,6 +51,7 @@ public class UTCOScraperDriver {
                             log.info("No more work.");
                             break;
                         }
+                        Thread.currentThread().setName("utco-" + letters + "-" + StringUtils.randomAlphanumeric(4));
                         new UTCOHealthInspectionScraper(establishmentService, inspectionService, violationService, seenEstablishments, inspDates)
                                 .run(letters);
                     } while (queue.hasMoreWork());
