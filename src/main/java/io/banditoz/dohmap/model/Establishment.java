@@ -1,6 +1,7 @@
 package io.banditoz.dohmap.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.banditoz.dohmap.utils.DateUtils;
 
 import java.time.Instant;
 
@@ -24,6 +25,11 @@ public record Establishment(String id, String name, String address, String city,
     @JsonIgnore
     public boolean isUtahCounty() {
         return source == DataSource.UTAH_COUNTY_PARAGON;
+    }
+
+    @JsonIgnore
+    public String getLastSeenAsRfc1123() {
+        return DateUtils.getDateAsRfc1123(lastSeen());
     }
 
     public static final class Builder {

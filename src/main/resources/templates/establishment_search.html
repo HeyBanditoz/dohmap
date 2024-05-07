@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta content="DOH Map Search!" property="og:title">
+    <meta th:content="${lastRank == null ? '' : 'Rank: ' + lastRank + '%. ' + inspections.size() + ' inspection' + (inspections.size() == 1 ? '' : 's') + '.'}" property="og:description">
+
+    <title>DOH Map Search!</title>
+    <div th:replace="~{fragments/scripts.html :: scripts}"></div>
+
+</head>
+<body onload="Init.page()">
+<nav th:replace="~{fragments/navbar.html :: navbar}"></nav>
+<div class="container">
+    <div class="row">
+        <form action="#" th:action="@{/establishmentSearch}" th:object="${search}" method="post">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <label for="search" class="input-group-text">Search</label>
+                </div>
+                <input id="search" autofocus type="text" placeholder="Find establishments..." th:field="*{search}" class="form-control">
+                <a class="btn btn-outline-secondary" data-toggle="tooltip" data-bs-placement="bottom"
+                   title="DOH Map uses Postgres' websearch_to_tsquery function to find results. See how you can control it here."
+                   href="https://adamj.eu/tech/2024/01/03/postgresql-full-text-search-websearch/" target="_blank">?</a>
+                <button class="btn btn-outline-success" type="submit">Go</button>
+            </div>
+        </form>
+    </div>
+    <br>
+    <div th:if="${establishments != null && establishments.isEmpty()}" class="alert alert-danger"
+         role="alert">No results found.</div>
+    <div th:if="${establishments != null && establishments.size() < 101 && !establishments.isEmpty()}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <div th:text="${establishments.size() + ' results found.'}"></div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${establishments != null && establishments.size() == 101}" class="alert alert-warning alert-dismissible fade show" role="alert">
+        <div th:text="'More than 100 results found. The result count has been limited to 100. Please refine your search.'"></div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="row" th:if="${establishments != null && !establishments.isEmpty()}">
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Type</th>
+                    <th>Last Seen</th>
+                    <th title="Inspections Count">Insp. Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="e : ${establishments}">
+                    <td>
+                        <a target="_blank" th:text="${e.establishment().name()}" th:href="@{/establishment} + '/' + ${e.establishment().id()}"></a>
+                    </td>
+                    <td th:text="${e.establishment().getFullAddress()}"></td>
+                    <td th:text="${e.establishment().type()}"></td>
+                    <td th:text="${e.establishment().getLastSeenAsRfc1123()}"></td>
+                    <td th:text="${e.inspectionCount()}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
