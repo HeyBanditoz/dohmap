@@ -75,6 +75,6 @@ public class UTCOScraperDriver {
     }
 
     public void kickOffScraper() {
-        go("aa");
+        go(null);
     }
 }
