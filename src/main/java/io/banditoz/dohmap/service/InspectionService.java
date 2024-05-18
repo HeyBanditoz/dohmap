@@ -6,6 +6,7 @@ import io.banditoz.dohmap.model.DataSource;
 import io.banditoz.dohmap.model.EstablishmentInspectionDate;
 import io.banditoz.dohmap.model.Inspection;
 import io.banditoz.dohmap.utils.DateSysId;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +17,13 @@ import java.util.stream.Collectors;
 @Service
 public class InspectionService {
     private final InspectionMapper inspectionMapper;
+    private final MeterRegistry registry;
 
     @Autowired
-    public InspectionService(InspectionMapper inspectionMapper) {
+    public InspectionService(InspectionMapper inspectionMapper,
+                             MeterRegistry registry) {
         this.inspectionMapper = inspectionMapper;
+        this.registry = registry;
     }
 
     public Inspection getOrCreateInspection(Inspection.Builder candidate) {
@@ -27,6 +31,9 @@ public class InspectionService {
         if (in == null) {
             in = candidate.setId(UuidCreator.getTimeOrderedEpoch().toString()).build();
             inspectionMapper.insertInspection(in);
+            registry.counter("dohmap_inspection_created").increment();
+        } else {
+            registry.counter("dohmap_inspection_exists").increment();
         }
         return in;
     }

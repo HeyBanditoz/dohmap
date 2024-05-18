@@ -10,6 +10,8 @@ import io.banditoz.dohmap.service.EstablishmentService;
 import io.banditoz.dohmap.service.InspectionService;
 import io.banditoz.dohmap.service.ViolationService;
 import io.banditoz.dohmap.utils.DateSysId;
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.Metrics;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static java.util.Collections.emptyList;
 
@@ -49,9 +52,10 @@ public class SLCOHealthInspectionScraper implements Runnable {
         SearchPage page = new SearchPage(driver).navigate();
         page.gotoPage(pageAssignment);
         log.info("ON PAGE {}", pageAssignment);
-        int jmax = page.ready().tableSize();
+        int jmax = measureFn("search", () -> page.ready().tableSize());
         for (int j = 0; j < jmax; j++) {
-            InspectionHistoryPage inspectionHistoryPage = page.ready().clickEstablishmentInspections(j);
+            int finalJ = j;
+            InspectionHistoryPage inspectionHistoryPage = measureFn("establishmentDetails", () -> page.ready().clickEstablishmentInspections(finalJ));
             Establishment est = establishmentService.getOrCreateEstablishment(inspectionHistoryPage.getEstablishmentInfo());
             establishmentService.indexEstablishmentRank(est, inspectionHistoryPage.getRank());
             for (Map.Entry<LocalDate, Integer> ent : inspectionHistoryPage.getInspections().entrySet()) {
@@ -59,7 +63,7 @@ public class SLCOHealthInspectionScraper implements Runnable {
                 if (previousInspectionDates.getOrDefault(est.id(), emptyList()).contains(DateSysId.ofDate(ent.getKey()))) {
                     continue;
                 }
-                InspectionPage inspectionPage = inspectionHistoryPage.clickInspection(ent.getValue());
+                InspectionPage inspectionPage = measureFn("inspectionDetails", () -> inspectionHistoryPage.clickInspection(ent.getValue()));
                 Inspection inspection = inspectionService.getOrCreateInspection(inspectionPage.getInspection().setEstablishmentId(est.id()));
                 List<Violation.Builder> violations = inspectionPage.getViolations();
                 for (Violation.Builder violation : violations) {
@@ -71,5 +75,17 @@ public class SLCOHealthInspectionScraper implements Runnable {
             inspectionHistoryPage.back();
         }
         log.info("This page took {} seconds.", (System.currentTimeMillis() - before) / 1000);
+    }
+
+    private <T> T measureFn(String op, Supplier<T> r) {
+        long before = System.nanoTime();
+        T t = r.get();
+        double timeTookSec = (System.nanoTime() - before) / 1_000_000_000D;
+        DistributionSummary.builder("dohmap_slco_request_time")
+                .tags("op", op)
+                .publishPercentiles(0.50, 0.75, 0.99)
+                .register(Metrics.globalRegistry)
+                .record(timeTookSec);
+        return t;
     }
 }

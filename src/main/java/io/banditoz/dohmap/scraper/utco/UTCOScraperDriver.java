@@ -7,16 +7,20 @@ import io.banditoz.dohmap.service.ViolationService;
 import io.banditoz.dohmap.utils.DateSysId;
 import io.banditoz.dohmap.utils.LetterUtils;
 import io.banditoz.dohmap.utils.WorkQueue;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class UTCOScraperDriver {
@@ -24,13 +28,17 @@ public class UTCOScraperDriver {
     private final EstablishmentService establishmentService;
     private final InspectionService inspectionService;
     private final ViolationService violationService;
+    private final AtomicInteger activeThreads;
 
     public UTCOScraperDriver(EstablishmentService establishmentService,
-                                       InspectionService inspectionService,
-                                       ViolationService violationService) {
+                             InspectionService inspectionService,
+                             ViolationService violationService,
+                             MeterRegistry registry) {
         this.establishmentService = establishmentService;
         this.inspectionService = inspectionService;
         this.violationService = violationService;
+        // should this be a class instead?
+        this.activeThreads = registry.gauge("dohmap_active_scrapers", List.of(Tag.of("kind", "utco")), new AtomicInteger(0));
     }
 
     public void go(String startAt) {
@@ -52,8 +60,7 @@ public class UTCOScraperDriver {
                             break;
                         }
                         Thread.currentThread().setName("utco-" + letters + "-" + StringUtils.randomAlphanumeric(4));
-                        new UTCOHealthInspectionScraper(establishmentService, inspectionService, violationService, seenEstablishments, inspDates)
-                                .run(letters);
+                        _go(seenEstablishments, inspDates, letters);
                     } while (queue.hasMoreWork());
                     log.info("No more work.");
                } catch (Exception ex) {
@@ -63,11 +70,20 @@ public class UTCOScraperDriver {
         }
     }
 
+    private void _go(Set<String> seenEstablishments, Map<String, List<DateSysId>> inspDates, String letters) throws IOException {
+        try {
+            activeThreads.getAndIncrement();
+            new UTCOHealthInspectionScraper(establishmentService, inspectionService, violationService, seenEstablishments, inspDates)
+                    .run(letters);
+        } finally {
+            activeThreads.getAndDecrement();
+        }
+    }
+
     public void goOnlyWithLetters(String letters) {
         Thread.ofVirtual().start(() -> {
-            UTCOHealthInspectionScraper s = new UTCOHealthInspectionScraper(establishmentService, inspectionService, violationService, null, Collections.emptyMap());
             try {
-                s.run(letters);
+                _go(null, Collections.emptyMap(), letters);
             } catch (Exception e) {
                 log.error("Uncaught exception running scraper!", e);
             }

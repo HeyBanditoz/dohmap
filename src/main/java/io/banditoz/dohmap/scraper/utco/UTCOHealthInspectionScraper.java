@@ -9,6 +9,8 @@ import io.banditoz.dohmap.service.EstablishmentService;
 import io.banditoz.dohmap.service.InspectionService;
 import io.banditoz.dohmap.service.ViolationService;
 import io.banditoz.dohmap.utils.DateSysId;
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.Metrics;
 import jakarta.annotation.Nullable;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -206,7 +208,8 @@ public class UTCOHealthInspectionScraper {
     }
 
     private Connection.Response placeRequest(String url, String body, Connection.Method method) {
-        return Failsafe.with(RETRY_POLICY).get(() -> Jsoup.connect(url)
+        long before = System.nanoTime();
+        Connection.Response response = Failsafe.with(RETRY_POLICY).get(() -> Jsoup.connect(url)
                 .header("Accept", "text/html")
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .userAgent("jsoup/1.17.2 (+banditoz@protonmail.com)") // no point in hiding it
@@ -214,6 +217,12 @@ public class UTCOHealthInspectionScraper {
                 .requestBody(body)
                 .timeout(120 * 1000) // two minutes
                 .execute());
+        double timeTookSec = (System.nanoTime() - before) / 1_000_000_000D;
+        DistributionSummary.builder("dohmap_utco_request_time")
+                .tags("op", getOpFromUrl(url))
+                .publishPercentiles(0.50, 0.75, 0.99).register(Metrics.globalRegistry)
+                .record(timeTookSec);
+        return response;
     }
 
     @Nullable
@@ -244,5 +253,20 @@ public class UTCOHealthInspectionScraper {
                 .setPhone(results.get(9))
                 .setSource(DataSource.UTAH_COUNTY_PARAGON)
                 .setSysId(unid);
+    }
+
+    // make this cleaner
+    private String getOpFromUrl(String url) {
+        if (url.contains("ag_dspPubDetail")) {
+            return "inspectionDetails";
+        } else if (url.contains("ag_getDocValues")) {
+            return "establishmentDetails";
+        } else if (url.contains("w_InspectionsPubSumm-NT")) {
+            return "inspectionList";
+        } else if (url.contains("SearchView")) {
+            return "search";
+        } else {
+            return "unknown";
+        }
     }
 }

@@ -7,6 +7,8 @@ import io.banditoz.dohmap.service.InspectionService;
 import io.banditoz.dohmap.service.ViolationService;
 import io.banditoz.dohmap.utils.DateSysId;
 import io.banditoz.dohmap.utils.WorkQueue;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class ScraperDriver {
@@ -31,6 +34,7 @@ public class ScraperDriver {
     private final InspectionService inspectionService;
     private final ViolationService violationService;
     private final int maxSessions;
+    private final AtomicInteger activeThreads;
     private static final Logger log = LoggerFactory.getLogger(ScraperDriver.class);
 
     @Autowired
@@ -38,12 +42,15 @@ public class ScraperDriver {
                          EstablishmentService establishmentService,
                          InspectionService inspectionService,
                          ViolationService violationService,
-                         @Value("${dohmap.selenium.sessions:1}") int maxSessions) {
+                         @Value("${dohmap.selenium.sessions:1}") int maxSessions,
+                         MeterRegistry registry) {
         this.webDriverFactory = webDriverFactory;
         this.establishmentService = establishmentService;
         this.inspectionService = inspectionService;
         this.violationService = violationService;
         this.maxSessions = maxSessions;
+        // should this be a class instead?
+        this.activeThreads = registry.gauge("dohmap_active_scrapers", List.of(Tag.of("kind", "slco")), new AtomicInteger(0));
     }
 
     private int getMaxPages() {
@@ -108,6 +115,7 @@ public class ScraperDriver {
         SLCOHealthInspectionScraper s = null;
         try {
             s = new SLCOHealthInspectionScraper(webDriver, page, establishmentService, inspectionService, violationService, previousInspections);
+            activeThreads.getAndIncrement();
             s.run();
         } catch (Exception ex) {
             log.error("Encountered fatal exception. Will attempt to restart current page {}. This could loop if there are network errors!", page, ex);
@@ -122,6 +130,7 @@ public class ScraperDriver {
         }
         finally {
             webDriverFactory.disposeDriver(webDriver);
+            activeThreads.getAndDecrement();
         }
     }
 

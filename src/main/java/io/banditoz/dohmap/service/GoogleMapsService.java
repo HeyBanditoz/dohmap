@@ -15,6 +15,7 @@ import io.banditoz.dohmap.model.Establishment;
 import io.banditoz.dohmap.model.googlemaps.places.Place;
 import io.banditoz.dohmap.model.googlemaps.places.Places;
 import io.banditoz.dohmap.model.googlemaps.places.TextQuery;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ public class GoogleMapsService {
     }
 
     @Async
+    @Timed(percentiles = {0.50, 0.75, 0.90, 0.99})
     public void indexEstablishment(Establishment est) {
         allowedTypes.stream()
                 .filter(allowedType -> est.type().toUpperCase().contains(allowedType))

@@ -4,6 +4,7 @@ import io.banditoz.dohmap.database.mapper.InspectionMapper;
 import io.banditoz.dohmap.model.DataSource;
 import io.banditoz.dohmap.model.EstablishmentInspectionDate;
 import io.banditoz.dohmap.utils.DateSysId;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +25,7 @@ class InspectionServiceTest {
     @BeforeEach
     void setup() {
         inspectionMapper = mock(InspectionMapper.class);
-        inspectionService = new InspectionService(inspectionMapper);
+        inspectionService = new InspectionService(inspectionMapper, new SimpleMeterRegistry());
     }
 
     @Test

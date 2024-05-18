@@ -9,6 +9,17 @@ mybatis:
   configuration:
     default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
 
+management:
+  server:
+    port: 9101
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+      base-path: "/"
+      path-mapping:
+        prometheus: "metrics"
+
 dohmap:
   jobs:
     full-run: 0 0 22 * * 5

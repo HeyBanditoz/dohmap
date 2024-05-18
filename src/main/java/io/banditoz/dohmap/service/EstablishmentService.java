@@ -9,6 +9,7 @@ import io.banditoz.dohmap.model.EstablishmentInspectionViolation;
 import io.banditoz.dohmap.model.dto.EstablishmentDto;
 import io.banditoz.dohmap.model.dto.EstablishmentInspectionViolationDto;
 import io.banditoz.dohmap.model.dto.InspectionDto;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,19 +30,22 @@ public class EstablishmentService {
     private final GoogleMapsService googleMapsService;
     private final Supplier<Instant> lastSeenCache;
     private static final Logger log = LoggerFactory.getLogger(EstablishmentService.class);
+    private final MeterRegistry registry;
 
     @Autowired
     public EstablishmentService(EstablishmentMapper establishmentMapper,
                                 EstablishmentRankMapper establishmentRankMapper,
                                 InspectionService inspectionService,
                                 ViolationService violationService,
-                                GoogleMapsService googleMapsService) {
+                                GoogleMapsService googleMapsService,
+                                MeterRegistry registry) {
         this.establishmentMapper = establishmentMapper;
         this.establishmentRankMapper = establishmentRankMapper;
         this.inspectionService = inspectionService;
         this.violationService = violationService;
         this.googleMapsService = googleMapsService;
         this.lastSeenCache = Suppliers.memoizeWithExpiration(establishmentMapper::get50thLatestLastSeen, 12, TimeUnit.HOURS);
+        this.registry = registry;
     }
 
     public Establishment getOrCreateEstablishment(Establishment.Builder candidate) {
@@ -50,9 +54,11 @@ public class EstablishmentService {
             est = candidate.setId(UuidCreator.getTimeOrderedEpoch().toString()).build();
             establishmentMapper.insertEstablishment(est);
             log.debug("{} was created!", est);
+            registry.counter("dohmap_establishment_created", "source", est.source().name()).increment();
         } else {
             log.debug("{} already exists. Updating last seen...", est);
             establishmentMapper.updateLastSeen(est);
+            registry.counter("dohmap_establishment_exists", "source", est.source().name()).increment();
         }
         // also fetch location from Google Maps, if needed
         googleMapsService.indexEstablishment(est);
