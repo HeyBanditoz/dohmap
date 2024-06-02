@@ -48,8 +48,7 @@
                     <th>Name</th>
                     <th>Address</th>
                     <th>Type</th>
-                    <th>Last Seen</th>
-                    <th title="Inspections Count">Insp. Count</th>
+                    <th>Last Inspection</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,8 +58,8 @@
                     </td>
                     <td th:text="${e.establishment().getFullAddress()}"></td>
                     <td th:text="${e.establishment().type()}"></td>
-                    <td th:text="${e.establishment().getLastSeenAsRfc1123()}"></td>
-                    <td th:text="${e.inspectionCount()}"></td>
+                    <td th:if="${e.lastInspection() != null}" th:text="${e.lastInspection()}"></td>
+                    <td th:if="${e.lastInspection() == null}"><i>None</i></td>
                 </tr>
             </tbody>
         </table>

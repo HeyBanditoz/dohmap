@@ -1,6 +1,6 @@
 package io.banditoz.dohmap.database.mapper;
 
-import io.banditoz.dohmap.model.EstablishmentInspectionCount;
+import io.banditoz.dohmap.model.EstablishmentLastInspection;
 import io.banditoz.dohmap.model.Pin;
 import io.banditoz.dohmap.model.Establishment;
 import org.apache.ibatis.annotations.*;
@@ -114,9 +114,10 @@ public interface EstablishmentMapper {
                    e.last_seen,
                    e.sys_id,
                    e.source,
-                   (SELECT COUNT(*) FROM inspection i WHERE i.establishment_id = e.id) AS inspectionCount
+                   (SELECT MAX(inspection_date) FROM inspection i WHERE i.establishment_id = e.id) AS lastInspection
             FROM establishment e
             WHERE e.fts @@ websearch_to_tsquery(#{query})
+            ORDER BY lastInspection DESC NULLS LAST
             LIMIT #{limit}""")
-    List<EstablishmentInspectionCount> getEstablishmentByWebSearchQuery(String query, int limit);
+    List<EstablishmentLastInspection> getEstablishmentByWebSearchQuery(String query, int limit);
 }

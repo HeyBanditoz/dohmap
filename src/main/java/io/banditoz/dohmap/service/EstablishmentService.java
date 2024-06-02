@@ -108,7 +108,7 @@ public class EstablishmentService {
         return lastSeenCache.get();
     }
 
-    public List<EstablishmentInspectionCount> getEstablishmentByWebSearchQuery(String query, int limit) {
+    public List<EstablishmentLastInspection> getEstablishmentByWebSearchQuery(String query, int limit) {
         return establishmentMapper.getEstablishmentByWebSearchQuery(query, limit);
     }
 }
