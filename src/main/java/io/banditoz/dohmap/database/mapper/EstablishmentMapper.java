@@ -1,6 +1,5 @@
 package io.banditoz.dohmap.database.mapper;
 
-import io.banditoz.dohmap.model.EstablishmentLastInspection;
 import io.banditoz.dohmap.model.Pin;
 import io.banditoz.dohmap.model.Establishment;
 import org.apache.ibatis.annotations.*;
@@ -101,23 +100,4 @@ public interface EstablishmentMapper {
 
     @Select("SELECT last_seen FROM establishment ORDER BY last_seen DESC LIMIT 1 OFFSET 50")
     Instant get50thLatestLastSeen();
-
-    @Select("""
-            SELECT e.id,
-                   e.name,
-                   e.address,
-                   e.city,
-                   e.state,
-                   e.zip,
-                   e.phone,
-                   e.type,
-                   e.last_seen,
-                   e.sys_id,
-                   e.source,
-                   (SELECT MAX(inspection_date) FROM inspection i WHERE i.establishment_id = e.id) AS lastInspection
-            FROM establishment e
-            WHERE e.fts @@ websearch_to_tsquery(#{query})
-            ORDER BY lastInspection DESC NULLS LAST
-            LIMIT #{limit}""")
-    List<EstablishmentLastInspection> getEstablishmentByWebSearchQuery(String query, int limit);
 }

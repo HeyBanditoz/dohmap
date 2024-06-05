@@ -33,6 +33,7 @@ dependencies {
     implementation("commons-io:commons-io:2.15.1")
     implementation("org.jsoup:jsoup:1.17.2")
     implementation("io.micrometer:micrometer-registry-prometheus:1.12.0")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     developmentOnly("org.springframework.boot:spring-boot-devtools:${sbVersion}")
     runtimeOnly("org.postgresql:postgresql:42.7.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test:${sbVersion}")

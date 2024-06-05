@@ -12,34 +12,59 @@
     <title>DOH Map Search!</title>
     <div th:replace="~{fragments/scripts.html :: scripts}"></div>
 
+    <script src="/static/chosen.jquery.min.js"></script>
+    <link href="/static/chosen.css" rel="stylesheet">
+
 </head>
-<body onload="Init.page()">
+<body onload="Init.page(); $('.multiple').chosen();">
 <nav th:replace="~{fragments/navbar.html :: navbar}"></nav>
 <div class="container">
     <div class="row">
-        <form action="#" th:action="@{/establishmentSearch}" th:object="${search}" method="post">
+        <form action="#" th:action="@{/establishmentSearch}" th:object="${search}" method="get">
             <div class="input-group">
                 <div class="input-group-prepend">
                     <label for="search" class="input-group-text">Search</label>
                 </div>
                 <input id="search" autofocus type="text" placeholder="Find establishments..." th:field="*{search}" class="form-control">
-                <a class="btn btn-outline-secondary" data-toggle="tooltip" data-bs-placement="bottom"
+                <a class="btn btn-outline-secondary" data-toggle="tooltip" data-bs-placement="right"
                    title="DOH Map uses Postgres' websearch_to_tsquery function to find results. See how you can control it here."
                    href="https://adamj.eu/tech/2024/01/03/postgresql-full-text-search-websearch/" target="_blank">?</a>
+                <label for="minimumInspCount" class="input-group-text">Minimum Inspection Count</label>
+                <input id="minimumInspCount" style="max-width: 10%;" class="form-control" name="minimumInspCount" type="number" th:value="${search.getMinimumInspCount()}">
+            </div>
+            <div class="input-group">
+<!--                <label for="cities" class="input-group-text">City</label>-->
+                <select name="cities" id="cities" class="form-select multiple" data-placeholder="All cities..." multiple>
+                    <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${search?.getCities()?.contains(city)}"></option>
+                </select>
+                <select name="sources" style="max-width: 15%;" id="sources" data-placeholder="All counties..." class="form-select multiple" multiple>
+                    <option th:each="o, i : ${T(io.banditoz.dohmap.model.DataSource).values()}"
+                            th:value="${o}" th:text="${o.getDisplayName()}" th:selected="${search?.getSources()?.contains(o)}"></option>
+                </select>
+                <label for="orderBy" class="input-group-text">Order By</label>
+                <select name="orderBy" style="max-width: 15%;" id="orderBy" class="form-select">
+                    <option th:each="o, i : ${T(io.banditoz.dohmap.model.search.SearchOrder).values()}"
+                            th:value="${o}" th:text="${o.getDisplayName()}" th:selected="${i.first || search?.getOrderBy() == o}"></option>
+                </select>
                 <button class="btn btn-outline-success" type="submit">Go</button>
             </div>
         </form>
     </div>
     <br>
     <div th:if="${establishments != null && establishments.isEmpty()}" class="alert alert-danger"
-         role="alert">No results found.</div>
-    <div th:if="${establishments != null && establishments.size() < 101 && !establishments.isEmpty()}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <div th:text="${establishments.size() + ' results found.'}"></div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <div th:if="${establishments != null && establishments.size() == 101}" class="alert alert-warning alert-dismissible fade show" role="alert">
-        <div th:text="'More than 100 results found. The result count has been limited to 100. Please refine your search.'"></div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+         role="alert" th:text="${'No results found. Search count time: ' + countTime + ' ms. Search query time: ' + searchTime + ' ms.'}">No results found.</div>
+    <div class="row">
+        <div class="col-12 d-flex">
+            <p class="mb-0" th:if="${establishments != null && !establishments.isEmpty()}"
+               th:text="${'Displaying ' + startAt + ' thru ' + endAt + ', total ' + totalCount + '. ' + 'Search count time: ' + countTime + ' ms. Search query time: ' + searchTime + ' ms.'}">
+            </p>
+            <div class="ms-auto">
+                <div th:if="${establishments.size() > 0}" class="input-group">
+                    <a class="btn btn-warning btn-sm" th:disabled="${page == 1}" th:classappend="${page == 1 ? 'disabled' : ''}" th:href="@{${url}}" th:with="url=${pager + (page - 1)}">Previous</a>
+                    <a class="btn btn-primary btn-sm" th:disabled="${page == maxPages}" th:classappend="${page == maxPages ? 'disabled' : ''}" th:href="@{${url}}" th:with="url=${pager + (page + 1)}">Next</a>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="row" th:if="${establishments != null && !establishments.isEmpty()}">
         <table class="table table-sm table-striped">
@@ -49,6 +74,7 @@
                     <th>Address</th>
                     <th>Type</th>
                     <th>Last Inspection</th>
+                    <th data-toggle="tooltip" title="Total number of inspections and violations. Average violation count per inspection.">Insp Count / Vln Count</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,9 +86,20 @@
                     <td th:text="${e.establishment().type()}"></td>
                     <td th:if="${e.lastInspection() != null}" th:text="${e.lastInspection()}"></td>
                     <td th:if="${e.lastInspection() == null}"><i>None</i></td>
+                    <td th:text="${e.inspectionCount()} + ' / ' + ${e.violationCount()} + ' — ' + ${e.getAverageViolationCountPerInspection()}"></td>
                 </tr>
             </tbody>
         </table>
+    </div>
+    <div class="row">
+        <div class="col-12 d-flex">
+            <div class="ms-auto">
+                <div th:if="${establishments.size() > 0}" class="input-group">
+                    <a class="btn btn-warning btn-sm" th:disabled="${page == 1}" th:classappend="${page == 1 ? 'disabled' : ''}" th:href="@{${url}}" th:with="url=${pager + (page - 1)}">Previous</a>
+                    <a class="btn btn-primary btn-sm" th:disabled="${page == maxPages}" th:classappend="${page == maxPages ? 'disabled' : ''}" th:href="@{${url}}" th:with="url=${pager + (page + 1)}">Next</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>

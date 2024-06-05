@@ -107,8 +107,4 @@ public class EstablishmentService {
     public Instant getLastSeenCutoff() {
         return lastSeenCache.get();
     }
-
-    public List<EstablishmentLastInspection> getEstablishmentByWebSearchQuery(String query, int limit) {
-        return establishmentMapper.getEstablishmentByWebSearchQuery(query, limit);
-    }
 }
