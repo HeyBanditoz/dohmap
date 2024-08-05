@@ -25,7 +25,11 @@ public class ViolationService {
         Violation v = violationMapper.getByViolation(candidate.build());
         if (v == null) {
             v = candidate.setId(UuidCreator.getTimeOrderedEpoch().toString()).build();
-            violationMapper.insertInspection(v);
+            Integer cPhrId = violationMapper.getViolationCodePublicHealthRationale(v);
+            if (cPhrId == null) {
+                cPhrId = violationMapper.insertViolationCodePublicHealthRationale(v);
+            }
+            violationMapper.insertViolation(v, cPhrId);
             registry.counter("dohmap_violation_created").increment();
         } else {
             registry.counter("dohmap_violation_exists").increment();

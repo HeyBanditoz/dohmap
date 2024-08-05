@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface ViolationMapper {
     @Select("""
-            SELECT id,
+            SELECT v.id,
                    inspection_id,
                    code,
                    observed,
@@ -19,13 +19,14 @@ public interface ViolationMapper {
                    occurrences,
                    corrected_on_site,
                    public_health_rationale
-            FROM violation
+            FROM violation v
+            JOIN violation_code_phr vcp on vcp.id = v.violation_code_phr_id
             WHERE id = #{id}::uuid""")
     Violation getById(String id);
 
     @Select("""
             <script>
-            SELECT id,
+            SELECT v.id,
                    inspection_id,
                    code,
                    observed,
@@ -34,7 +35,8 @@ public interface ViolationMapper {
                    occurrences,
                    corrected_on_site,
                    public_health_rationale
-            FROM violation
+            FROM violation v
+            JOIN violation_code_phr vcp on vcp.id = v.violation_code_phr_id
             WHERE inspection_id = #{inspectionId}::uuid
               AND <if test="code != null">code = #{code}</if> <if test="code == null">code IS NULL</if>
               AND <if test="observed != null">observed = #{observed}</if> <if test="observed == null">observed IS NULL</if>
@@ -49,13 +51,25 @@ public interface ViolationMapper {
 
     @Insert("""
             INSERT INTO violation
-              (id, inspection_id, code, observed, points, critical, occurrences, corrected_on_site, public_health_rationale)
+              (id, inspection_id, observed, points, critical, occurrences, corrected_on_site, violation_code_phr_id)
             VALUES
-              (#{id}::uuid, #{inspectionId}::uuid, #{code}, #{observed}, #{points}, #{critical}, #{occurrences}, #{correctedOnSite}, #{publicHealthRationale})""")
-    Integer insertInspection(Violation violation);
+              (#{v.id}::uuid, #{v.inspectionId}::uuid, #{v.observed}, #{v.points}, #{v.critical}, #{v.occurrences}, #{v.correctedOnSite}, #{cPhrId})""")
+    Integer insertViolation(Violation v, int cPhrId);
+
+    @Select("INSERT INTO violation_code_phr (code, public_health_rationale) VALUES (#{code}, #{publicHealthRationale}) RETURNING id")
+    int insertViolationCodePublicHealthRationale(Violation violation);
 
     @Select("""
-            SELECT id,
+            <script>
+            SELECT id
+            FROM violation_code_phr
+            WHERE <if test="code != null">code = #{code}</if> <if test="code == null">code IS NULL</if>
+              AND <if test="publicHealthRationale != null">public_health_rationale = #{publicHealthRationale}</if> <if test="publicHealthRationale == null">public_health_rationale IS NULL</if>
+            </script>""")
+    Integer getViolationCodePublicHealthRationale(Violation violation);
+
+    @Select("""
+            SELECT v.id,
                    inspection_id,
                    code,
                    observed,
@@ -64,9 +78,10 @@ public interface ViolationMapper {
                    occurrences,
                    corrected_on_site,
                    public_health_rationale
-            FROM violation
+            FROM violation v
+            JOIN violation_code_phr vcp on vcp.id = v.violation_code_phr_id
             WHERE inspection_id = #{inspectionId}::uuid
-            ORDER BY id""")
+            ORDER BY v.id""")
     List<Violation> getViolationsByInspection(String inspectionId);
 
     @Select("SELECT COUNT(*) FROM violation;")
