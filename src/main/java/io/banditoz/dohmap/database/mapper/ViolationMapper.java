@@ -96,4 +96,22 @@ public interface ViolationMapper {
                OR e.type ILIKE '%Beverage%'
                OR e.type ILIKE '%breakfast%';""")
     int getRestaurantBeverageCount();
+
+    @Select("""
+            SELECT v.id,
+                   inspection_id,
+                   code,
+                   observed,
+                   points,
+                   critical,
+                   occurrences,
+                   corrected_on_site,
+                   public_health_rationale
+            FROM violation v
+            JOIN violation_code_phr vcp ON vcp.id = v.violation_code_phr_id
+            JOIN inspection i ON v.inspection_id = i.id
+            JOIN establishment e ON i.establishment_id = e.id
+            WHERE e.id = #{id}::uuid
+            ORDER BY v.id""")
+    List<Violation> getAllViolationsByEstablishment(String id);
 }

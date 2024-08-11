@@ -18,8 +18,11 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+
+import static java.util.Collections.emptyList;
 
 @Service
 public class EstablishmentService {
@@ -66,11 +69,11 @@ public class EstablishmentService {
     }
 
     public EstablishmentInspectionViolation getIvByEstablishment(Establishment e) {
-        // TODO n+1 present here
+        Map<String /* inspection ID */, List<Violation>> vlns = violationService.getAllViolationsByEstablishment(e);
         List<InspectionViolation> list = inspectionService.getAllInspectionsByEstablishmentId(e.id())
                 .stream()
                 .sorted(Comparator.comparing(Inspection::inspectionDate).reversed())
-                .map(i -> InspectionViolation.of(i, violationService.getViolationsByInspection(i.id())))
+                .map(i -> InspectionViolation.of(i, vlns.getOrDefault(i.id(), emptyList())))
                 .toList();
         Integer lastRank = getLastRankForEstablishment(e.id());
         return new EstablishmentInspectionViolation(e, list, lastRank);

@@ -2,12 +2,15 @@ package io.banditoz.dohmap.service;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import io.banditoz.dohmap.database.mapper.ViolationMapper;
+import io.banditoz.dohmap.model.Establishment;
 import io.banditoz.dohmap.model.Violation;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ViolationService {
@@ -39,5 +42,10 @@ public class ViolationService {
 
     public List<Violation> getViolationsByInspection(String inspectionId) {
         return violationMapper.getViolationsByInspection(inspectionId);
+    }
+
+    public Map<String, List<Violation>> getAllViolationsByEstablishment(Establishment e) {
+        return violationMapper.getAllViolationsByEstablishment(e.id()).stream()
+                .collect(Collectors.groupingBy(Violation::inspectionId));
     }
 }
