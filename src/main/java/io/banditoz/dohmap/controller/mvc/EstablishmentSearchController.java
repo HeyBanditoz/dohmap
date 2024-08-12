@@ -44,6 +44,7 @@ public class EstablishmentSearchController {
         Instrumentation<Integer> count = instrument(() -> searchService.getCountForQuery(query));
         Instrumentation<List<EstablishmentSearch>> establishments = instrument(() -> searchService.getEstablishmentByWebSearchQuery(query, page));
         String queryString = request == null ? "" : request.getQueryString() == null ? "" : request.getQueryString().replaceAll("&page=\\d+", "");
+        model.addAttribute("activePage", "search");
         model.addAttribute("establishments", establishments.getResult());
         model.addAttribute("count", statsService.getCountOfEstInspVioAsString());
         model.addAttribute("cities", searchService.getCities());

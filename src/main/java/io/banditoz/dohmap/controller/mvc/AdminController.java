@@ -31,6 +31,7 @@ public class AdminController {
     @GetMapping("")
     public String index(Model model) {
         model.addAttribute("count", statsService.getCountOfEstInspVioAsString());
+        model.addAttribute("activePage", "admin");
         return "admin/admin";
     }
 

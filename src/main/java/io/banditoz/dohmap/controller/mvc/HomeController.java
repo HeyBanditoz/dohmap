@@ -19,6 +19,7 @@ public class HomeController {
     public String index(Model model) {
         model.addAttribute("count", statsService.getCountOfEstInspVioAsString());
         model.addAttribute("showLoad", true);
+        model.addAttribute("activePage", "home");
         return "index";
     }
 }
