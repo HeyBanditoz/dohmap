@@ -7,7 +7,7 @@ plugins {
 
 group = "io.banditoz"
 version = "0.0.1-SNAPSHOT"
-val sbVersion = "3.2.2"
+val sbVersion = "3.3.4"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -35,7 +35,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.12.0")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     developmentOnly("org.springframework.boot:spring-boot-devtools:${sbVersion}")
-    runtimeOnly("org.postgresql:postgresql:42.7.1")
+    runtimeOnly("org.postgresql:postgresql:42.7.4")
     testImplementation("org.springframework.boot:spring-boot-starter-test:${sbVersion}")
 }
 
