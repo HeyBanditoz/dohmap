@@ -27,7 +27,7 @@ dependencies {
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
     implementation("org.mybatis:mybatis-typehandlers-jsr310:1.0.2")
     implementation("com.agido:logback-elasticsearch-appender:3.0.10")
-    implementation("org.seleniumhq.selenium:selenium-java:4.18.1")
+    implementation("org.seleniumhq.selenium:selenium-java:4.25.0")
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("com.github.f4b6a3:uuid-creator:5.3.3")
     implementation("commons-io:commons-io:2.15.1")
