@@ -110,4 +110,8 @@ public class EstablishmentService {
     public Instant getLastSeenCutoff() {
         return lastSeenCache.get();
     }
+
+    public List<Establishment> getAllEstablishmentsWithMissingLocations() {
+        return establishmentMapper.getAllEstablishmentsWithMissingLocations();
+    }
 }

@@ -25,6 +25,25 @@ public interface EstablishmentMapper {
             WHERE id = #{id}::uuid""")
     Establishment getById(String id);
 
+    @Select("""
+            SELECT id,
+                   name,
+                   address,
+                   city,
+                   state,
+                   zip,
+                   phone,
+                   type,
+                   last_seen,
+                   sys_id,
+                   source
+            FROM establishment
+            WHERE id NOT IN (SELECT establishment_id
+                             FROM establishment_location el
+                             WHERE establishment.id = el.establishment_id
+                               AND el.deleted_on IS NULL);""")
+    List<Establishment> getAllEstablishmentsWithMissingLocations();
+
     // TODO need to centralize last_seen logic below there...
     @Select("""
             SELECT e.id,

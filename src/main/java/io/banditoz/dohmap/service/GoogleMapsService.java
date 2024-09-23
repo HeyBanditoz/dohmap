@@ -61,12 +61,17 @@ public class GoogleMapsService {
     @Timed(percentiles = {0.50, 0.75, 0.90, 0.99})
     public void indexEstablishment(Establishment est) {
         allowedTypes.stream()
-                .filter(allowedType -> est.type().toUpperCase().contains(allowedType))
+                .filter(this::isEstablishmentTypeAllowed)
                 .findFirst()
                 .ifPresentOrElse(
                         ignored -> _indexEstablishment(est),
                         () -> log.debug("{} wasn't in any of the allowed establishment types: {}", est, allowedTypes)
                 );
+    }
+
+    public boolean isEstablishmentTypeAllowed(String s) {
+        return allowedTypes.stream()
+                .anyMatch(type -> type.toUpperCase().contains(s.toUpperCase()));
     }
 
     private void _indexEstablishment(Establishment est) {
@@ -96,14 +101,14 @@ public class GoogleMapsService {
         if (establishmentLocationMapper.markCurrentLocationDeleted(establishment.id()) == 0) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Update didn't change any rows");
         }
-        establishmentLocationMapper.insert(new EstablishmentLocation(
+        insert(new LocationRaw(new EstablishmentLocation(
                 UuidCreator.getTimeOrderedEpoch().toString(),
                 null,
                 establishment.id(),
                 lat,
                 lng,
                 Source.MANUAL,
-                null), null);
+                null), null));
     }
 
     private Optional<LocationRaw> getLocationFromGeocodingApi(Establishment est) {
@@ -150,8 +155,9 @@ public class GoogleMapsService {
 
     private void insert(LocationRaw loc) {
         try {
+            EstablishmentLocation el = loc.el();
             establishmentLocationMapper.insert(loc.el(), objectMapper.writeValueAsString(loc.raw()));
-            log.debug("Indexed {}'s location using Google Maps", loc.el().establishmentId());
+            log.info("Indexed {}'s location using {} at {},{}", el.establishmentId(), el.source(), el.lat(), el.lng());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

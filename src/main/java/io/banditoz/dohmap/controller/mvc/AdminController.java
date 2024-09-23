@@ -1,7 +1,10 @@
 package io.banditoz.dohmap.controller.mvc;
 
+import io.banditoz.dohmap.model.Establishment;
 import io.banditoz.dohmap.scraper.ScraperDriver;
 import io.banditoz.dohmap.scraper.utco.UTCOScraperDriver;
+import io.banditoz.dohmap.service.EstablishmentService;
+import io.banditoz.dohmap.service.GoogleMapsService;
 import io.banditoz.dohmap.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,20 +15,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
     private final StatsService statsService;
     private final ScraperDriver scraperDriver;
     private final UTCOScraperDriver utcoScraperDriver;
+    private final EstablishmentService establishmentService;
+    private final GoogleMapsService googleMapsService;
 
     @Autowired
     public AdminController(StatsService statsService,
                            ScraperDriver scraperDriver,
-                           UTCOScraperDriver utcoScraperDriver) {
+                           UTCOScraperDriver utcoScraperDriver,
+                           EstablishmentService establishmentService, GoogleMapsService googleMapsService) {
         this.statsService = statsService;
         this.scraperDriver = scraperDriver;
         this.utcoScraperDriver = utcoScraperDriver;
+        this.establishmentService = establishmentService;
+        this.googleMapsService = googleMapsService;
     }
 
     @GetMapping("")
@@ -90,6 +100,16 @@ public class AdminController {
     public RedirectView utcoTest(RedirectAttributes attributes) {
         utcoScraperDriver.go(null);
         attributes.addFlashAttribute("successText", "Full UTCOScraperDriver started. Please check the logs to monitor success.");
+        return new RedirectView("/admin");
+    }
+
+    @GetMapping("/reaffirmLocations")
+    public RedirectView reaffirmLocations(RedirectAttributes attributes) {
+        List<Establishment> missingLocs = establishmentService.getAllEstablishmentsWithMissingLocations().stream()
+                .filter(establishment -> googleMapsService.isEstablishmentTypeAllowed(establishment.type()))
+                .toList();
+        missingLocs.forEach(googleMapsService::indexEstablishment);
+        attributes.addFlashAttribute("successText", "Reaffirming locations for " + missingLocs.size() + " establishments with no locations.");
         return new RedirectView("/admin");
     }
 }
