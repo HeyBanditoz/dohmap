@@ -54,6 +54,8 @@ install the [pg-uuidv7](https://pgxn.org/dist/pg_uuidv7/) extension.
 
 ## Assumptions about their data model
 
+Salt Lake County's health inspections uses Oracle DB for their datastore.
+
 Unfortunately, since the site they use seems pretty old (check it out! they use XP-themed tables and such), they do not
 expose any IDs of any kind.
 

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GoogleMapsService {
@@ -71,9 +72,19 @@ public class GoogleMapsService {
     private void _indexEstablishment(Establishment est) {
         if (establishmentLocationMapper.getByEstablishmentId(est.id()) == null) {
             if (usePlacesApi) {
-                indexEstablishmentPlacesApi(est);
+                getLocationFromPlacesApi(est, false)
+                        .or(() -> {
+                            log.warn("Falling back to address only...");
+                            return getLocationFromPlacesApi(est, true);
+                        })
+                        .or(() -> {
+                            log.warn("Falling back to geocoding API...");
+                            return getLocationFromGeocodingApi(est);
+                        })
+                        .ifPresentOrElse(this::insert, () -> log.error("Couldn't find location for establishment {}.", est));
             } else {
-                indexEstablishmentGoogleMapsGeocoding(est);
+                getLocationFromGeocodingApi(est)
+                        .ifPresentOrElse(this::insert, () -> log.error("Couldn't find location for establishment {}.", est));
             }
         } else {
             log.debug("{}'s location already exists, skipping GoogleMapsService...", est);
@@ -95,15 +106,15 @@ public class GoogleMapsService {
                 null), null);
     }
 
-    private void indexEstablishmentGoogleMapsGeocoding(Establishment est) {
+    private Optional<LocationRaw> getLocationFromGeocodingApi(Establishment est) {
         GoogleMapsResponse gmr = googleMapsClient.get(est.getFullAddress());
         if (gmr == null) {
             log.warn("Google Maps Geocoding API returned null/empty object for {}", est);
-            return;
+            return Optional.empty();
         }
         if (gmr.results().isEmpty()) {
             log.warn("Google Maps Geocoding API returned empty list for {}", est);
-            return;
+            return Optional.empty();
         }
         if (gmr.results().size() > 1) {
             log.warn("Google Maps Geocoding API returned more than one response for {}! Using the first response...", est);
@@ -111,35 +122,44 @@ public class GoogleMapsService {
 
         ResultsItem ri = gmr.results().getFirst();
         Location loc = ri.geometry().location();
-        insert(new EstablishmentLocation(UuidCreator.getTimeOrderedEpoch().toString(), ri.placeId(), est.id(), loc.lat(), loc.lng(), Source.GOOGLE_MAPS_GEOCODING_API, null), gmr);
+        EstablishmentLocation el = new EstablishmentLocation(UuidCreator.getTimeOrderedEpoch().toString(), ri.placeId(), est.id(), loc.lat(), loc.lng(), Source.GOOGLE_MAPS_GEOCODING_API, null);
+        return LocationRaw.of(el, gmr);
     }
 
-    private void indexEstablishmentPlacesApi(Establishment est) {
-        Places places = googleMapsPlacesClient.getPlaceByQuery(new TextQuery(est.getNameAndFullAddress()));
+    private Optional<LocationRaw> getLocationFromPlacesApi(Establishment est, boolean addressOnly) {
+        Places places = googleMapsPlacesClient.getPlaceByQuery(new TextQuery(addressOnly ? est.getFullAddress() : est.getNameAndFullAddress()));
         if (places == null || places.places() == null) {
-            log.warn("Google Maps Places API returned null/empty object for {}, falling back to geocoding API...", est);
-            indexEstablishmentGoogleMapsGeocoding(est);
-            return;
+            log.warn("Google Maps Places API returned null/empty object for {}... addressOnly={}", est, addressOnly);
+            return Optional.empty();
         }
         if (places.places().isEmpty()) {
-            log.warn("Google Maps Places API returned empty list for {}, falling back to geocoding API...", est);
-            indexEstablishmentGoogleMapsGeocoding(est);
-            return;
+            log.warn("Google Maps Places API returned empty list for {}... addressOnly={}", est, addressOnly);
+            return Optional.empty();
         }
         if (places.places().size() > 1) {
-            log.warn("Google Maps Places API returned more than one response for {}! Using the first response...", est);
+            log.warn("Google Maps Places API returned more than one response for {}! Using the first response... addressOnly={}", est, addressOnly);
         }
 
         Place p = places.places().getFirst();
-        insert(new EstablishmentLocation(UuidCreator.getTimeOrderedEpoch().toString(), p.id(), est.id(), p.location().lat(), p.location().lng(), Source.GOOGLE_MAPS_PLACES_API, null), places);
+        EstablishmentLocation el = new EstablishmentLocation(UuidCreator.getTimeOrderedEpoch().toString(), p.id(),
+                est.id(), p.location().lat(), p.location().lng(),
+                addressOnly ? Source.GOOGLE_MAPS_GEOCODING_API_ADDRESS_ONLY : Source.GOOGLE_MAPS_PLACES_API, null
+        );
+        return LocationRaw.of(el, places);
     }
 
-    private void insert(EstablishmentLocation estLoc, Object json) {
+    private void insert(LocationRaw loc) {
         try {
-            establishmentLocationMapper.insert(estLoc, objectMapper.writeValueAsString(json));
-            log.debug("Indexed {}'s location using Google Maps", estLoc.establishmentId());
+            establishmentLocationMapper.insert(loc.el(), objectMapper.writeValueAsString(loc.raw()));
+            log.debug("Indexed {}'s location using Google Maps", loc.el().establishmentId());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private record LocationRaw(EstablishmentLocation el, Object raw) {
+        public static Optional<LocationRaw> of(EstablishmentLocation el, Object raw) {
+            return Optional.of(new LocationRaw(el, raw));
         }
     }
 }
