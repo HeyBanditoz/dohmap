@@ -19,6 +19,7 @@ dohmap:
     use-places-api: false
   selenium:
     sessions: 2
+    remote: http://grid-url:4444
     args: >
-      --headless=new
+      --headless=new  # not needed for remote selenium sessions
   origin: https://dohmap.com
