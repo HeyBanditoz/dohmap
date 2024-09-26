@@ -60,13 +60,11 @@ public class GoogleMapsService {
     @Async
     @Timed(percentiles = {0.50, 0.75, 0.90, 0.99})
     public void indexEstablishment(Establishment est) {
-        allowedTypes.stream()
-                .filter(this::isEstablishmentTypeAllowed)
-                .findFirst()
-                .ifPresentOrElse(
-                        ignored -> _indexEstablishment(est),
-                        () -> log.debug("{} wasn't in any of the allowed establishment types: {}", est, allowedTypes)
-                );
+        if (isEstablishmentTypeAllowed(est.type())) {
+            _indexEstablishment(est);
+        } else {
+            log.debug("{} wasn't in any of the allowed establishment types: {}", est, allowedTypes);
+        }
     }
 
     public boolean isEstablishmentTypeAllowed(String s) {
