@@ -20,15 +20,19 @@ Copy the `src/main/resources/application-local.example.yml` file to `src/main/re
 database. If you want to run the Selenium indexers, set `dohmap.selenium.sessions` to be over 0, set a login, and head
 to `/admin` to test the scrapers.
 
+### Data Model
+Here's the current data model DOH Map! uses:
+<img src='examples/schema_2024-09-27.png' width='500'>
+
 ## Brief
 
 This projects ingests data from Salt Lake
 County's [health inspection database](https://public.cdpehs.com/UTEnvPbl/VW_EST_PUBLIC/ShowVW_EST_PUBLICTablePage.aspx)
 by means of scraping most of the data available on the site through concurrent Selenium browser sessions.
 
-The scrapers are kicked off using a cronjob, which, by default, starts every Monday through Thursday at 21:00 local
-system time for a quick (lite) run. The lite run does not check for new violations on inspections already in the
-database.
+The scrapers are kicked off using a cronjob scheduled by Spring Boot, which, by default, starts every
+Monday through Thursday at 21:00 local system time for a quick (lite) run. The lite run does not check for new
+violations on inspections already in the database.
 
 A full run (which acts as if there is no data, so it checks all inspections) happens at Friday at 21:00, in-case the
 health department does change older inspections (this is currently unknown, it would only add violations and not remove
