@@ -35,8 +35,8 @@ public class LoggerFilter implements Filter {
     }
 
     private String getLogLine(HttpServletRequest req, HttpServletResponse resp, String path, long durationMs) {
-        return "method=\"%s\" path=\"%s\" duration=\"%dms\" status=\"%s\" userAgent=\"%s\" %s"
-                .formatted(req.getMethod(), path, durationMs, resp.getStatus(), req.getHeader("User-Agent"), determineHost(req));
+        return "method=\"%s\" path=\"%s\" duration=\"%dms\" status=\"%s\" userAgent=\"%s\" %s referer=\"%s\""
+                .formatted(req.getMethod(), path, durationMs, resp.getStatus(), req.getHeader("User-Agent"), determineHost(req), req.getHeader("Referer"));
     }
 
     private boolean shouldLog(String path) {
