@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta content="About DOH Map!" property="og:title">
+
+    <title>DOH Map! - About</title>
+    <div th:replace="~{fragments/scripts.html :: scripts}"></div>
+</head>
+<body>
+<nav th:replace="~{fragments/navbar.html :: navbar}"></nav>
+<div class="container" th:utext="${aboutText}">
+</div>
+</body>
+</html>
