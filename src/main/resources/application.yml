@@ -37,3 +37,6 @@ dohmap:
     ['PLEASANT GROVCE']: PLEASANT GROVE
     ['PLEASAT GROVE']: PLEASANT GROVE
     ['PROVO CANYON']: PROVO
+
+springdoc:
+  paths-to-exclude: '/api/admin/**'

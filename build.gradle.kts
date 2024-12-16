@@ -25,6 +25,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator:${sbVersion}")
     implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.2.RELEASE")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
     implementation("org.mybatis:mybatis-typehandlers-jsr310:1.0.2")
     implementation("com.agido:logback-elasticsearch-appender:3.0.10")
     implementation("org.seleniumhq.selenium:selenium-java:4.25.0")
