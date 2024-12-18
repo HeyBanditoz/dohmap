@@ -23,7 +23,9 @@ dohmap:
     # headless may not be needed for remote selenium sessions
     args: >
       --headless=new
+  # these are separate incase they need to be different
   origin: https://dohmap.com
+  url: https://dohmap.com
   about-page: >
     <h1>About DOH Map!</h1>
     <p>Default about page!</p>
