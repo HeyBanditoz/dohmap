@@ -35,12 +35,14 @@ public class EstablishmentSearchController {
     }
 
     @GetMapping
-    public String search(@ModelAttribute Search query, @RequestParam(defaultValue = "1") int page, Model model, HttpServletRequest request) {
+    public String search(@ModelAttribute Search query,
+                         @RequestParam(defaultValue = "1") int page,
+                         Model model,
+                         HttpServletRequest request) {
         if (query.getRealSearch() == null) {
             query.setSearch("");
             query.setOrderBy(SearchOrder.LAST_INSPECTION);
         }
-        log.info("\"Searching\" query=\"{}\"", query);
         Instrumentation<Integer> count = instrument(() -> searchService.getCountForQuery(query));
         Instrumentation<List<EstablishmentSearch>> establishments = instrument(() -> searchService.getEstablishmentByWebSearchQuery(query, page));
         String queryString = request == null ? "" : request.getQueryString() == null ? "" : request.getQueryString().replaceAll("&page=\\d+", "");

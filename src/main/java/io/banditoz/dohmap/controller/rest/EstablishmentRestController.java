@@ -4,6 +4,7 @@ import io.banditoz.dohmap.model.BaseResponse;
 import io.banditoz.dohmap.model.Establishment;
 import io.banditoz.dohmap.model.dto.EstablishmentInspectionViolationDto;
 import io.banditoz.dohmap.service.EstablishmentService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,8 @@ public class EstablishmentRestController {
         this.establishmentService = establishmentService;
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping(value = "/{uuid}", produces = "application/json")
+    @Operation(summary = "Get establishment by ID, and its inspections and violations within.")
     public ResponseEntity<BaseResponse<EstablishmentInspectionViolationDto>> getEstablishmentAndInspectionsViolations(@PathVariable UUID uuid) {
         Establishment est = establishmentService.getEstablishmentById(uuid.toString());
         if (est == null) {

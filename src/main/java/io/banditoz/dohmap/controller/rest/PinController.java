@@ -22,7 +22,7 @@ public class PinController {
         this.establishmentPinService = establishmentPinService;
     }
 
-    @GetMapping("all")
+    @GetMapping(value = "all", produces = "application/json")
     @Operation(
             summary = "Internal endpoint for the map renderer.",
             description = "Fetches all establishments that are food service related, and their location on a map."

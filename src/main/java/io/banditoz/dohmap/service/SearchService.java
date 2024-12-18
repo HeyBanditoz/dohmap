@@ -6,6 +6,8 @@ import com.google.common.base.Suppliers;
 import io.banditoz.dohmap.database.mapper.SearchMapper;
 import io.banditoz.dohmap.model.EstablishmentSearch;
 import io.banditoz.dohmap.model.search.Search;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,7 @@ public class SearchService {
             .maximumSize(1000)
             .build();
     private final Supplier<List<String>> cities;
+    private static final Logger log = LoggerFactory.getLogger(SearchService.class);
 
     @Autowired
     public SearchService(SearchMapper searchMapper) {
@@ -30,6 +33,7 @@ public class SearchService {
     }
 
     public List<EstablishmentSearch> getEstablishmentByWebSearchQuery(Search search, int page) {
+        log.info("\"Searching\" query=\"{}\"", search);
         if (rowCountCache.asMap().get(search) == 0) {
             return Collections.emptyList(); // don't run the search query if the row count was determined to be zero
         }
