@@ -63,9 +63,6 @@ public class EstablishmentSearchRestController {
             query.setSearch("");
             query.setOrderBy(SearchOrder.LAST_INSPECTION);
         }
-        if (query.getOrderBy() == null) {
-            query.setOrderBy(SearchOrder.LAST_INSPECTION);
-        }
         Instrumentation<Integer> count = instrument(() -> searchService.getCountForQuery(query));
         Instrumentation<List<EstablishmentSearch>> establishments = instrument(() -> searchService.getEstablishmentByWebSearchQuery(query, page));
         PageMetadata pageMetadata = new PageMetadata(page, (int) Math.ceil((double) count.getResult() / 50), ((page - 1) * 50) + 1, count.getNanosTook() / 1_000_000, establishments.getNanosTook() / 1_000_000);
